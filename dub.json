@@ -1,0 +1,13 @@
+{
+    "authors": [
+        "bunnytale"
+    ],
+    "copyright": "Copyright © 2023, bunnytale",
+    "dependencies": {
+        "raylib-d": "~>4.2.4"
+    },
+    "libs": ["raylib"],
+    "description": "simple implementation of tetris in dlang",
+    "license": "proprietary",
+    "name": "raylib-dlang-tetris"
+}
