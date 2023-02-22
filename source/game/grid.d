@@ -6,7 +6,7 @@ struct Vector2 { int x, y; }
 
 struct GameGrid
 {
-    enum State
+    static enum State
     {
         Empty = 0,
         Full,
@@ -15,10 +15,12 @@ struct GameGrid
         Fading,
     }
 
-    const gridRowSize = 12;
-    const gridColSize = 20;
+    static const gridRowSize = 12;
+    static const gridColSize = 20;
 
-    const squareSize   = 20;
+    static const squareSize   = 20;
+
+    Color fadingColor;;  
 
     int[gridRowSize][gridColSize] grid;
 
@@ -148,13 +150,12 @@ struct GameGrid
                 grid[line][colCounter] = State.Fading;
             }
         }
-
-        for (int colCounter = (gridRowSize-2); colCounter >= 1; colCounter--)
+        for (int rowCounter = 1; rowCounter < (gridColSize - 1); rowCounter++)
         {
             bool hasFoundEmptySquare     = false;
             //bool hasFoundOnlyEmptySquare = true;
 
-            for (int rowCounter = 1; rowCounter < gridColSize; rowCounter++)
+            for (int colCounter = 1; colCounter < gridRowSize; colCounter++)
             {
                 const auto current = grid[rowCounter][colCounter];
 
@@ -189,9 +190,9 @@ struct GameGrid
             test_grid.grid[18][colCounter] = State.Full;
         }
 
-        for (int colCounter = 1; colCounter < 11; colCounter++)
+        for (int colCounter = 0; colCounter < GameGrid.gridRowSize; colCounter++)
         {
-            test_grid.grid[17][colCounter] = State.Full;
+            assert(test_grid.grid[18][colCounter] != State.Empty);
         }
         
         test_grid.grid[17][2] = State.Full;
@@ -202,13 +203,116 @@ struct GameGrid
         // -- assertions --
         import std.format;
 
-        for (int colCounter = 1; colCounter < 11; colCounter++)
+        for (int colCounter = 1; colCounter < (GameGrid.gridRowSize-1); colCounter++)
         {
             const msg = format(">failed to assert colunm %d<", colCounter);
-            assert(test_grid.grid[17][colCounter] == State.Fading, msg);
+            assert(test_grid.grid[18][colCounter] == State.Fading, msg);
         }
         assert(test_grid.grid[17][2] == State.Full);
         assert(test_grid.grid[16][3] == State.Full);
+    }
+
+    void removeFading()
+    {
+        
+        bool isRowEmpty(int row)
+        {
+            for (int colCounter = 0; colCounter < rowGridSize; colCounter++)
+            {
+                if (grid[row][colCounter] != State.Full && grid[row][colCounter] != State.Fading)
+                {
+                    return false; 
+                }
+
+            }
+
+            return true;
+        }
+        ushort firstEmptyLine;
+        for (counter = (rowGridSize-2); counter > 0; counter--)
+        {
+            if (isRowEmpty(counter))
+            {
+                firstEmptyLine = counter;
+                break;
+            }
+        }
+
+        ushort[gridColSize] permutation;  
+        for (auto counter = 0; counter < ((gridColSize-1)-firstEmptyLine); counter++)
+        {
+            permutation[counter] = counter;
+        }
+
+        void decreaseRest(ref int[] value, ushort index, ushort limit)
+        {
+            for(int counter = index; counter < limit; counter++)
+            {
+                value[counter]--;
+            }
+        }
+        for (int rowCounter = (GameGrid.gridColSize-1); rowCounter > firstEmptyLine; rowCounter--)
+        {
+            if (grid[rowCounter][1] == State.Fading)
+            {
+                decreaseRest(permutations, ((GameGrid.gridColSize-1) - rowCounter), firstEmptyLine);
+            }
+        }
+
+        void applyPermutations(int[] permutations, int limit)
+        {
+            // @ todo
+        }
+
+    }
+
+
+    unittest
+    {
+        GameGrid test_grid;
+        test_grid.init();
+
+        // --- full grid ---
+        test_grid.grid[14][1] = State.Full;
+        test_grid.grid[14][2] = State.Full;
+        test_grid.grid[14][8] = State.Full;
+        
+        for (int colCounter = 1; colCounter < 11; colCounter++)
+        {
+            test_grid.grid[15][colCounter] = State.Fading;
+        }
+        for (int colCounter = 1; colCounter < 11; colCounter++)
+        {
+            test_grid.grid[16][colCounter] = State.Fading;
+        }
+
+        test_grid.grid[17][8] = State.Full;
+        test_grid.grid[17][9] = State.Full;
+
+        for (int colCounter = 1; colCounter < 11; colCounter++)
+        {
+            test_grid.grid[18][colCounter] = State.Fading;
+        }
+
+        // --- remove fading lines --- 
+
+       test_grid.removeFading();
+       
+       // --- do assertions ---
+
+        for (int colCounter = 1; colCounter < 11; colCounter++)
+        {
+            assert(test_grid.grid[16][colCounter] == State.empty);
+        }
+        assert(test_grid.grid[17][1] == State.Full);
+        assert(test_grid.grid[17][2] == State.Full);
+        assert(test_grid.grid[17][8] == State.Full);
+        assert(test_grid.grid[17][7] == State.Empty);
+
+        assert(test_grid.grid[18][8] == State.Full);
+        assert(test_grid.grid[18][9] == State.Full);
+        assert(test_grid.grid[18][7] == State.Empty);
+
     }
 
     void draw()
@@ -240,7 +344,7 @@ struct GameGrid
             DrawRectangle(offset.x, offset.y, squareSize, squareSize, Colors.LIME);
             break;
           case State.Fading:
-            DrawRectangle(offset.x, offset.y, squareSize, squareSize, Colors.MAROON);
+            DrawRectangle(offset.x, offset.y, squareSize, squareSize, fadingColor);
             break;
           default: assert(0);
           }
