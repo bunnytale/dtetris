@@ -12,7 +12,11 @@ class Game
 
     int respawnTiming    = 120;
     int spawnTimeCounter = 0;
-    bool isPieceFalling       = true;
+    bool isPieceFalling  = true;
+
+    const fadeTiming   = 40;
+    auto  fadeCounter  = 0;
+    bool isBlockFading = false;
 
     this()
     {
@@ -24,6 +28,18 @@ class Game
        for (auto counter = 1; counter < 10; counter++)
        {
             grid.grid[18][counter] = grid.State.Full;
+       }
+       for (auto counter = 1; counter < 10; counter++)
+       {
+            grid.grid[17][counter] = grid.State.Full;
+       }
+       for (auto counter = 1; counter < 10; counter++)
+       {
+            grid.grid[16][counter] = grid.State.Full;
+       }
+       for (auto counter = 1; counter < 10; counter++)
+       {
+            grid.grid[15][counter] = grid.State.Full;
        }
     }
 
@@ -44,6 +60,19 @@ class Game
 
     void update()
     {
+        if (isBlockFading)
+        {
+            fadeCounter++;
+        }
+
+        if (isBlockFading && fadeCounter > fadeTiming)
+        {
+            isBlockFading = false;
+            fadeCounter   = 0;
+            
+            grid.removeFading();
+        }
+
         bool isSpawnTimerOver = spawnTimeCounter >= respawnTiming;
         if (!isPieceFalling && !isSpawnTimerOver)
         {
@@ -71,6 +100,7 @@ class Game
             grid.markCompletion();
 
             isPieceFalling = false;
+            isBlockFading  = true;
         }
 
         grid.move();
