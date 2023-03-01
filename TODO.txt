@@ -1,0 +1,8 @@
+[- pending] [. done]
+
+. create GameGrid.canMoveHorizontally method
+- create GameGrid.moveHorizontal method
+- rename move method to moveVertical
+- improve move method by updating blocks around the piece position
+- improve hasDetectedCollision method
+

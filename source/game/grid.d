@@ -2,7 +2,9 @@ module game.grid;
 
 import raylib;
 
-struct Vector2 { int x, y; }
+struct Vector2 { 
+    int x, y;
+}
 
 struct GameGrid
 {
@@ -23,6 +25,9 @@ struct GameGrid
     Color fadingColor;
 
     int[gridRowSize][gridColSize] grid;
+    
+    static const pieceSquareSize = 4;
+    Vector2 piecePosition;
 
     void init()
     {
@@ -565,6 +570,81 @@ struct GameGrid
 
         assert(testGrid.grid[17][4] == State.Empty);
         assert(testGrid.grid[17][8] == State.Empty);
+    }
+    
+    bool canMoveHorizontally(const short direction)
+    {
+        Vector2 oppositeVertex;
+        oppositeVertex.x =  piecePosition.x + GameGrid.pieceSquareSize + direction;
+        oppositeVertex.y =  piecePosition.y + GameGrid.pieceSquareSize;
+
+        for (auto colCounter = piecePosition.y + direction; colCounter < oppositeVertex.y; colCounter++)
+        {
+            for (auto rowCounter = piecePosition.x + direction; rowCounter < oppositeVertex.x; rowCounter++)
+            {
+                const auto current = grid[colCounter][rowCounter];
+                const bool isBlockingState = current == State.Full || current == State.Block;
+                if (isBlockingState && grid[colCounter][rowCounter - direction] == State.Moving)
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    unittest
+    {
+        // --- initialize test grid ---
+        GameGrid testGrid; 
+        testGrid.init();
+
+        Vector2 piecePosition = Vector2(5, 14);
+        assert(piecePosition.x == 5);
+
+        testGrid.piecePosition = piecePosition;
+
+        for (int colCounter = 1; colCounter < (GameGrid.gridRowSize - 2); colCounter++)
+        {
+            testGrid.grid[18][colCounter] = State.Full;
+        }
+        for (int rowCounter = 14; rowCounter < 18; rowCounter++)
+        {
+            testGrid.grid[rowCounter][5] = State.Full;
+        }
+
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
+        testGrid.grid[piecePosition.y + 2][piecePosition.x + 1] = State.Moving;
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] = State.Moving;
+        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Moving;
+
+        bool canMoveLeft = testGrid.canMoveHorizontally(-1);
+        assert(!canMoveLeft);
+
+        bool canMoveRight = testGrid.canMoveHorizontally(1);
+        assert(canMoveRight);
+    }
+
+    unittest
+    {
+        // --- initialize test grid ---
+        GameGrid testGrid; 
+        testGrid.init();
+
+        Vector2 piecePosition = Vector2(8, 14);
+
+        testGrid.piecePosition = piecePosition;
+
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
+        testGrid.grid[piecePosition.y + 2][piecePosition.x + 1] = State.Moving;
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] = State.Moving;
+        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Moving;
+
+        bool canMoveLeft = testGrid.canMoveHorizontally(-1);
+        assert(canMoveLeft);
+
+        bool canMoveRight = testGrid.canMoveHorizontally(1);
+        assert(!canMoveRight);
     }
 
     void draw()
