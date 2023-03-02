@@ -45,7 +45,7 @@ struct GameGrid
         }
     }
 
-    void move()
+    void moveVertical()
     {
         for (int colCounter = (gridColSize-1); colCounter >= 0; colCounter--)
         {

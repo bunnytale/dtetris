@@ -103,7 +103,7 @@ class Game
             isBlockFading  = true;
         }
 
-        grid.move();
+        grid.moveVertical();
     }
 
     void spawnPiece()

@@ -3,8 +3,10 @@
 + create GameGrid.canMoveHorizontally method
 + create GameGrid.moveHorizontal method
 - write a controller to move the piece horizontally
-- rename move method to moveVertical
++ rename move method to moveVertical
 - write a controller to make piece fall faster
-- improve move method by updating blocks around the piece position
+- improve moveVertical method by updating blocks around the piece position
 - improve hasDetectedCollision method
-
+- create a mechanics to generate a random piece amoung them;
+- create a method to get the area the piece
+- create a controller to rotate the piece
