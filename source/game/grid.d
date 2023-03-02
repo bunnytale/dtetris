@@ -57,7 +57,6 @@ struct GameGrid
                     grid[colCounter][rowCounter]   = State.Empty;
                }
             }
-
         }
     }
 
@@ -645,6 +644,82 @@ struct GameGrid
 
         bool canMoveRight = testGrid.canMoveHorizontally(1);
         assert(!canMoveRight);
+    }
+
+    void moveHorizontal(int direction)
+    {
+        Vector2 oppositeVertex;
+        oppositeVertex.x =  piecePosition.x + GameGrid.pieceSquareSize + direction;
+        oppositeVertex.y =  piecePosition.y + GameGrid.pieceSquareSize;
+
+        void moveLeft()
+        {
+            for (auto colCounter = piecePosition.y; colCounter < oppositeVertex.y; colCounter++)
+            {
+                for (auto rowCounter = (oppositeVertex.x + 1); rowCounter > (piecePosition.x + 1); rowCounter--)
+                {
+                    // @ todo
+                    if (grid[colCounter][rowCounter - 1] != State.Moving)
+                    {
+                        continue;
+                    }
+
+                    grid[colCounter][rowCounter - 1] = State.Empty;
+                    grid[colCounter][rowCounter]     = State.Moving;
+                }
+            }
+        }
+
+        void moveRight()
+        {
+            for (auto colCounter = piecePosition.y; colCounter < oppositeVertex.y; colCounter++)
+            {
+                for (auto rowCounter = piecePosition.x - 1; rowCounter < (oppositeVertex.x - 1); rowCounter++)
+                {
+                    // @ todo
+                    if (grid[colCounter][rowCounter + 1] != State.Moving)
+                    {
+                        continue;
+                    }
+
+                    grid[colCounter][rowCounter + 1] = State.Empty;
+                    grid[colCounter][rowCounter]     = State.Moving;
+                }
+            }
+        }
+
+        if (direction > 0)
+        {
+            moveLeft();
+        } else {
+            moveRight();
+        }
+
+        piecePosition.x += direction;
+    }
+
+    unittest
+    {
+        GameGrid testGrid; 
+        testGrid.init();
+
+        Vector2 piecePosition = Vector2(5, 14);
+
+        testGrid.piecePosition = piecePosition;
+
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
+        testGrid.grid[piecePosition.y + 2][piecePosition.x + 1] = State.Moving;
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] = State.Moving;
+        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Moving;
+
+        testGrid.moveHorizontal(1);
+
+        assert(testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] == State.Moving);
+        assert(testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] == State.Moving);
+        assert(testGrid.grid[piecePosition.y + 1][piecePosition.x + 3] == State.Moving);
+        assert(testGrid.grid[piecePosition.y + 2][piecePosition.x + 3] == State.Moving);
+
+        assert(testGrid.piecePosition.x == (piecePosition.x + 1));
     }
 
     void draw()

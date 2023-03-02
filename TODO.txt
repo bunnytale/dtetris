@@ -1,8 +1,10 @@
-[- pending] [. done]
+[- pending] [+ done]
 
-. create GameGrid.canMoveHorizontally method
-- create GameGrid.moveHorizontal method
++ create GameGrid.canMoveHorizontally method
++ create GameGrid.moveHorizontal method
+- write a controller to move the piece horizontally
 - rename move method to moveVertical
+- write a controller to make piece fall faster
 - improve move method by updating blocks around the piece position
 - improve hasDetectedCollision method
 
