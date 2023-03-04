@@ -10,8 +10,9 @@ class Game
     const lateralMovementTiming  = 5;
     auto  lateralMovementCounter = 0;
 
-    int pieceGravityTiming = 40;
-    int gravityTime        = 0;
+    int pieceGravityTiming      = 40;
+    int gravityTime             = 0;
+    const fastFallGravityTiming = 5;
 
     int respawnTiming    = 120;
     int spawnTimeCounter = 0;
@@ -93,7 +94,11 @@ class Game
             isPieceFalling = true;
         }
 
-        if (gravityTime == pieceGravityTiming)
+        const isFastFallActive = IsKeyDown(KeyboardKey.KEY_DOWN);
+        if (gravityTime >= pieceGravityTiming && !isFastFallActive)
+        {
+            gravityTime = 0;
+        } else if (gravityTime >= fastFallGravityTiming && isFastFallActive)
         {
             gravityTime = 0;
         } else {
