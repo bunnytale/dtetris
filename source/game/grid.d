@@ -58,6 +58,8 @@ struct GameGrid
                }
             }
         }
+
+        piecePosition.y++;
     }
 
     void stopPiece()
@@ -574,22 +576,61 @@ struct GameGrid
     bool canMoveHorizontally(const short direction)
     {
         Vector2 oppositeVertex;
-        oppositeVertex.x =  piecePosition.x + GameGrid.pieceSquareSize + direction;
-        oppositeVertex.y =  piecePosition.y + GameGrid.pieceSquareSize;
+        oppositeVertex.x = piecePosition.x + GameGrid.pieceSquareSize + direction;
+        oppositeVertex.y = piecePosition.y + GameGrid.pieceSquareSize;
 
-        for (auto colCounter = piecePosition.y + direction; colCounter < oppositeVertex.y; colCounter++)
+        for (auto colCounter = piecePosition.y; colCounter < oppositeVertex.y; colCounter++)
         {
-            for (auto rowCounter = piecePosition.x + direction; rowCounter < oppositeVertex.x; rowCounter++)
+            for (auto rowCounter = piecePosition.x; rowCounter <= oppositeVertex.x; rowCounter++)
             {
-                const auto current = grid[colCounter][rowCounter];
-                const bool isBlockingState = current == State.Full || current == State.Block;
-                if (isBlockingState && grid[colCounter][rowCounter - direction] == State.Moving)
+                if (rowCounter + direction < 0)
+                {
+                    continue;
+                }
+
+                if (rowCounter + direction >= GameGrid.gridRowSize)
+                {
+                    continue;
+                }
+
+                assert(rowCounter >= 0);
+                assert(rowCounter + direction >= 0);
+                assert(rowCounter < GameGrid.gridRowSize);
+
+                const auto current         = grid[colCounter][rowCounter];
+                const auto next            = grid[colCounter][rowCounter + direction];
+                const bool isNextBlocking  = next == State.Block || next == State.Full;
+                if (isNextBlocking && current == State.Moving)
                 {
                     return false;
                 }
             }
         }
         return true;
+    }
+
+    unittest
+    {
+        GameGrid testGrid; 
+        testGrid.init();
+
+        Vector2 piecePosition = Vector2(0, 4);
+
+        testGrid.piecePosition = piecePosition;
+
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
+        testGrid.grid[piecePosition.y + 2][piecePosition.x + 1] = State.Moving;
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] = State.Moving;
+        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Moving;
+
+        assert(testGrid.grid[piecePosition.y + 1][piecePosition.x] == State.Block);
+        assert(testGrid.grid[piecePosition.y + 2][piecePosition.x] == State.Block);
+        
+        bool canMoveLeft = testGrid.canMoveHorizontally(-1);
+        assert(!canMoveLeft);
+
+        bool canMoveRight = testGrid.canMoveHorizontally(1);
+        assert(canMoveRight);
     }
 
     unittest
@@ -658,6 +699,18 @@ struct GameGrid
             {
                 for (auto rowCounter = (oppositeVertex.x + 1); rowCounter > (piecePosition.x + 1); rowCounter--)
                 {
+                    if (rowCounter >= GameGrid.gridRowSize)
+                    {
+                        continue; 
+                    }
+
+                    assert(rowCounter < GameGrid.gridRowSize);
+
+                    if (rowCounter <= 1)
+                    {
+                        continue;
+                    }
+
                     // @ todo
                     if (grid[colCounter][rowCounter - 1] != State.Moving)
                     {
@@ -672,10 +725,16 @@ struct GameGrid
 
         void moveRight()
         {
+            assert(oppositeVertex.y     > 0);
+            assert(oppositeVertex.x - 1 > 0);
+
             for (auto colCounter = piecePosition.y; colCounter < oppositeVertex.y; colCounter++)
             {
                 for (auto rowCounter = piecePosition.x - 1; rowCounter < (oppositeVertex.x - 1); rowCounter++)
                 {
+                    assert(colCounter >= 0);
+                    assert(rowCounter + 1 < GameGrid.gridRowSize);
+                    
                     // @ todo
                     if (grid[colCounter][rowCounter + 1] != State.Moving)
                     {
