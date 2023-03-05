@@ -93,16 +93,24 @@ struct GameGrid
 
     bool hasDetectedCollision()
     {
-        for (int colCounter = (gridColSize-1); colCounter >= 1; colCounter--)
+        for (int colCounter = piecePosition.y; colCounter < piecePosition.y + pieceSquareSize; colCounter++)
         {
-            for (int rowCounter = 0; rowCounter < gridRowSize; rowCounter++)
+            for (int rowCounter = piecePosition.x; rowCounter < piecePosition.x + pieceSquareSize; rowCounter++)
             {
-                bool is_upper_square_moving = grid[colCounter-1][rowCounter] == State.Moving;
+                if (rowCounter >= GameGrid.gridRowSize)
+                {
+                    continue;
+                }
 
-                int current              = grid[colCounter][rowCounter];
-                bool is_current_blocking = current == State.Full || current == State.Block;
+                assert(rowCounter < GameGrid.gridRowSize);
 
-                if (is_upper_square_moving && is_current_blocking)
+                int lowerPiece            = grid[colCounter+1][rowCounter];
+                bool isLowerPieceBlocking = lowerPiece == State.Block || lowerPiece == State.Full;
+
+                int current          = grid[colCounter][rowCounter];
+                bool isCurrentMoving = current == State.Moving;
+
+                if (isCurrentMoving && isLowerPieceBlocking)
                 {
                     return true;
                 }
@@ -114,25 +122,32 @@ struct GameGrid
 
     unittest
     {
-        GameGrid test_grid; 
-        
-        test_grid.grid[18][5] = State.Full;
-        test_grid.grid[17][5] = State.Moving;
+        GameGrid testGrid; 
+        testGrid.init();
 
-        bool hasDetectedCollision = test_grid.hasDetectedCollision();
+        Vector2 piecePosition  = Vector2(4, 16);
+        testGrid.piecePosition = piecePosition;
+
+        testGrid.grid[18][5] = State.Full;
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
+
+        bool hasDetectedCollision = testGrid.hasDetectedCollision();
         assert(hasDetectedCollision);
     }
 
     unittest
     {
-        GameGrid test_grid; 
-        test_grid.init();
+        GameGrid testGrid; 
+        testGrid.init();
 
-        test_grid.grid[18][5] = State.Moving;
+        Vector2 piecePosition  = Vector2(4, 17);
+        testGrid.piecePosition = piecePosition;
 
-        assert(test_grid.grid[19][5] == State.Block);
+        testGrid.grid[18][5] = State.Moving;
 
-        bool hasDetectedCollision = test_grid.hasDetectedCollision();
+        assert(testGrid.grid[19][5] == State.Block);
+
+        bool hasDetectedCollision = testGrid.hasDetectedCollision();
         assert(hasDetectedCollision);
     }
 
@@ -583,6 +598,11 @@ struct GameGrid
         {
             for (auto rowCounter = piecePosition.x; rowCounter <= oppositeVertex.x; rowCounter++)
             {
+                if (rowCounter >= GameGrid.gridRowSize)
+                {
+                    continue;
+                }
+
                 if (rowCounter + direction < 0)
                 {
                     continue;

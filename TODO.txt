@@ -6,7 +6,8 @@
 + rename move method to moveVertical
 + write a controller to make piece fall faster
 - improve moveVertical method by updating blocks around the piece position
-- improve hasDetectedCollision method
-- create a mechanics to generate a random piece amoung them;
++ improve hasDetectedCollision method
+- write a rule to detect when the player lose
+- create a mechanics to get a random piece;
 - create a method to get the area the piece
 - create a controller to rotate the piece
