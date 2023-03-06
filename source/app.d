@@ -5,16 +5,16 @@ import game: Game;
 void main()
 {
     validateRaylibBinding();
-    InitWindow(800, 600, "hello, Raylib-d!");
+    InitWindow(800, 600, "tetris");
     SetTargetFPS(60);
 
     auto mainGame = new Game;
 
     while (!WindowShouldClose())
     {
-        BeginDrawing();
-
         mainGame.update();
+
+        BeginDrawing();
         mainGame.drawFrame();
 
         EndDrawing();

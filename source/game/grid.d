@@ -47,15 +47,33 @@ struct GameGrid
 
     void moveVertical()
     {
-        for (int colCounter = (gridColSize-1); colCounter >= 0; colCounter--)
+        for (int colCounter = piecePosition.y + pieceSquareSize; colCounter >= piecePosition.y; colCounter--)
         {
-            for (int rowCounter = 0; rowCounter < gridRowSize; rowCounter++)
+            for (int rowCounter = piecePosition.x; rowCounter < piecePosition.x + pieceSquareSize; rowCounter++)
             {
-               if (grid[colCounter][rowCounter] == State.Moving)
-               {
+                if (colCounter < 0)
+                {
+                    continue;
+                }
+                
+                if (colCounter >= GameGrid.gridColSize)
+                {
+                    continue;
+                }
+
+                if (rowCounter >= GameGrid.gridRowSize)
+                {
+                    continue;
+                }
+
+                assert(rowCounter >= 0);
+                assert(rowCounter < GameGrid.gridRowSize);
+
+                if (grid[colCounter][rowCounter] == State.Moving)
+                {
                     grid[colCounter+1][rowCounter] = State.Moving;
                     grid[colCounter][rowCounter]   = State.Empty;
-               }
+                }
             }
         }
 
@@ -64,10 +82,29 @@ struct GameGrid
 
     void stopPiece()
     {
-        for (int colCounter = 0; colCounter < (gridColSize-1); colCounter++)
+        for (int colCounter = piecePosition.y + pieceSquareSize; colCounter >= piecePosition.y; colCounter--)
         {
-            for (int rowCounter = 0; rowCounter < gridRowSize; rowCounter++)
+            for (int rowCounter = piecePosition.x; rowCounter < piecePosition.x + pieceSquareSize; rowCounter++)
             {
+
+                if (rowCounter >= GameGrid.gridRowSize)
+                {
+                    continue;
+                }
+
+                if (colCounter >= GameGrid.gridColSize)
+                {
+                    continue;
+                }
+
+                if (rowCounter < 0)
+                {
+                    continue;
+                }
+
+                assert(rowCounter < GameGrid.gridRowSize);
+                assert(colCounter < GameGrid.gridColSize);
+
                 if (grid[colCounter][rowCounter] == State.Moving)
                 {
                     grid[colCounter][rowCounter] = State.Full;
@@ -80,6 +117,9 @@ struct GameGrid
     {
         GameGrid testGrid;
         testGrid.init();
+
+        Vector2 piecePosition = Vector2(4, 17);
+        testGrid.piecePosition = piecePosition;
 
         testGrid.grid[18][5] = State.Moving;
 
