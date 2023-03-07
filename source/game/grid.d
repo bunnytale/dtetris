@@ -20,7 +20,7 @@ struct GameGrid
     static const ushort gridRowSize = 12;
     static const ushort gridColSize = 20;
 
-    static const ushort squareSize   = 20;
+    static const ushort squareSize  = 20;
 
     Color fadingColor;
 
@@ -839,6 +839,134 @@ struct GameGrid
         assert(testGrid.grid[piecePosition.y + 2][piecePosition.x + 3] == State.Moving);
 
         assert(testGrid.piecePosition.x == (piecePosition.x + 1));
+    }
+
+    int[][] getPieceSlice()
+    {
+        int pieceSpaceHeight = pieceSquareSize;
+        if (piecePosition.y + pieceSpaceHeight > GameGrid.gridColSize)
+        {
+            pieceSpaceHeight = GameGrid.gridColSize - piecePosition.y;
+        }
+
+        int[][] blocks = new int[][pieceSpaceHeight];
+
+        int pieceSpaceWidth = piecePosition.x + pieceSquareSize;
+        
+        if (pieceSpaceWidth >= GameGrid.gridRowSize) 
+        {
+            for (auto counter = 0; counter < pieceSpaceHeight; counter++)
+            {
+                blocks[counter] = grid[piecePosition.y + counter][piecePosition.x .. $];
+            }
+        } else if (pieceSpaceWidth > pieceSquareSize) {
+            for (auto counter = 0; counter < pieceSpaceHeight; counter++)
+            {
+                blocks[counter] = grid[piecePosition.y + counter][piecePosition.x .. pieceSpaceWidth];
+            }
+        } else {
+            for (auto counter = 0; counter < pieceSpaceHeight; counter++)
+            {
+                blocks[counter] = grid[piecePosition.y + counter][0 .. pieceSpaceWidth];
+            }
+        }
+
+        return blocks;
+    }
+
+    unittest
+    {
+        GameGrid testGrid;
+        testGrid.init();
+
+        Vector2 piecePosition  = Vector2(5, 16);
+        testGrid.piecePosition = piecePosition;
+         
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
+        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Full;
+
+        const auto pieceSpace = testGrid.getPieceSlice();
+
+        assert(pieceSpace[1][1] == State.Moving);
+        assert(pieceSpace[2][2] == State.Full);
+
+        foreach (element; pieceSpace[3])
+        {
+            assert(element == State.Block);
+        }
+    }
+
+    unittest
+    {
+        GameGrid testGrid;
+        testGrid.init();
+
+        Vector2 piecePosition  = Vector2(9, 16);
+        testGrid.piecePosition = piecePosition;
+         
+        testGrid.grid[piecePosition.y][piecePosition.x]         = State.Moving;
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Full;
+
+        const auto pieceSpace = testGrid.getPieceSlice();
+
+        assert(pieceSpace[0][0] == State.Moving);
+        assert(pieceSpace[1][1] == State.Full);
+
+        foreach (row; pieceSpace)
+        {
+            assert(row[$ - 1] == State.Block);
+            assert(row.length == 3);
+        }
+        
+        foreach (element; pieceSpace[3])
+        {
+            assert(element == State.Block);
+        }
+    }
+
+    unittest
+    {
+        GameGrid testGrid;
+        testGrid.init();
+
+        Vector2 piecePosition  = Vector2(-1, 16);
+        testGrid.piecePosition = piecePosition;
+         
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] = State.Moving;
+        testGrid.grid[piecePosition.y + 2][piecePosition.x + 3] = State.Full;
+
+        const auto pieceSpace = testGrid.getPieceSlice();
+
+        assert(pieceSpace[1][1] == State.Moving);
+        assert(pieceSpace[2][2] == State.Full);
+
+        foreach (row; pieceSpace)
+        {
+            assert(row[0] == State.Block);
+            assert(row.length == 3);
+        }
+        
+        foreach (element; pieceSpace[3])
+        {
+            assert(element == State.Block);
+        }
+    }
+
+    unittest
+    {
+        GameGrid testGrid;
+        testGrid.init();
+
+        Vector2 piecePosition  = Vector2(5, 16);
+        testGrid.piecePosition = piecePosition;
+         
+        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
+        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Full;
+
+        auto pieceSpace = testGrid.getPieceSlice();
+
+        pieceSpace[1][2] = State.Moving;
+        assert(testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] == State.Moving);
     }
 
     void draw()
