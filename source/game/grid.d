@@ -1,11 +1,18 @@
+
 module game.grid;
 
 import raylib;
 
+// @ todo : remove this and use library implementation instead
 struct Vector2 { 
     int x, y;
 }
 
+//  GameGrid:
+//  store information about the game
+//  grid structure, such as current
+//  piece position and filled rows
+//
 struct GameGrid
 {
     static enum State
@@ -20,15 +27,24 @@ struct GameGrid
     static const ushort gridRowSize = 12;
     static const ushort gridColSize = 20;
 
+    // used in drawing routine
     static const ushort squareSize  = 20;
 
+    // allow adding a fade effect to fadding rows
     Color fadingColor;
 
+    // actual grid which holds each square state
     int[gridRowSize][gridColSize] grid;
-    
+  
+    // piece width/height in number of square
     static const pieceSquareSize = 4;
     Vector2 piecePosition;
 
+    // ------------------------------
+    // initialize game table with a 
+    // blocking row at the end of the grid
+    // and two columns at both sides
+    // 
     void init()
     {
         for (int colCounter = 0; colCounter <= (gridColSize-1); colCounter++)
@@ -45,6 +61,9 @@ struct GameGrid
         }
     }
 
+    // ------------------------------
+    // apply gravity effect over the piece
+    //
     void moveVertical()
     {
         for (int colCounter = piecePosition.y + pieceSquareSize; colCounter >= piecePosition.y; colCounter--)
@@ -80,6 +99,9 @@ struct GameGrid
         piecePosition.y++;
     }
 
+    // ------------------------------
+    // turn every colliding piece into filled blocks
+    //
     void stopPiece()
     {
         for (int colCounter = piecePosition.y + pieceSquareSize; colCounter >= piecePosition.y; colCounter--)
@@ -130,7 +152,12 @@ struct GameGrid
         assert(testGrid.grid[18][6] == State.Empty);
         assert(testGrid.grid[17][5] == State.Empty);
     }
-
+    
+    // ------------------------------
+    // check for any possible collision on the grid
+    // and returns true if any have been found, false
+    // otherwise
+    //
     bool hasDetectedCollision()
     {
         for (int colCounter = piecePosition.y; colCounter < piecePosition.y + pieceSquareSize; colCounter++)
@@ -201,6 +228,10 @@ struct GameGrid
         assert(!hasDetectedCollision);
     }
 
+    // ------------------------------
+    // turn every complete row into a 
+    // fadding row
+    //
     void markCompletion()
     {
     
@@ -364,6 +395,11 @@ struct GameGrid
         return true;
     }
 
+    // ------------------------------
+    // move rows based on map passed as
+    // argument, with size delimited by
+    // the limit parameter
+    //
     private void applyPermutations(ushort[gridColSize] permutations, uint limit)
     {
         int lastLine = 0;
