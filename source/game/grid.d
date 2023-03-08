@@ -1,9 +1,8 @@
-
 module game.grid;
 
 import raylib;
 
-// @ todo : remove this and use library implementation instead
+// @ todo : remove this and use the library implementation instead
 struct Vector2 { 
     int x, y;
 }
@@ -34,7 +33,7 @@ struct GameGrid
     Color fadingColor;
 
     // actual grid which holds each square state
-    int[gridRowSize][gridColSize] grid;
+    State[gridRowSize][gridColSize] grid;
   
     // piece width/height in number of square
     static const pieceSquareSize = 4;
@@ -47,16 +46,17 @@ struct GameGrid
     // 
     void init()
     {
-        for (int colCounter = 0; colCounter <= (gridColSize-1); colCounter++)
+        for (int col = 0; col <= (gridColSize-1); col++)
         {
-            for (int rowCounter = 0; rowCounter < gridRowSize; rowCounter++)
+            for (int row = 0; row < gridRowSize; row++)
             {
-                if (colCounter == (gridColSize - 1) || rowCounter == (gridRowSize - 1) || rowCounter == 0)
+                if (col == (gridColSize - 1) || row == (gridRowSize - 1) || row == 0)
                 {
-                    grid[colCounter][rowCounter] = State.Block;
-                } else {
-                    grid[colCounter][rowCounter] = State.Empty;
+                    grid[col][row] = State.Block;
+                    continue;
                 }
+
+                grid[col][row] = State.Empty;
             }
         }
     }
@@ -66,32 +66,32 @@ struct GameGrid
     //
     void moveVertical()
     {
-        for (int colCounter = piecePosition.y + pieceSquareSize; colCounter >= piecePosition.y; colCounter--)
+        for (int col = piecePosition.y + pieceSquareSize; col >= piecePosition.y; col--)
         {
-            for (int rowCounter = piecePosition.x; rowCounter < piecePosition.x + pieceSquareSize; rowCounter++)
+            for (int row = piecePosition.x; row < piecePosition.x + pieceSquareSize; row++)
             {
-                if (colCounter < 0)
+                if (col < 0)
                 {
                     continue;
                 }
                 
-                if (colCounter >= GameGrid.gridColSize)
+                if (col >= GameGrid.gridColSize)
                 {
                     continue;
                 }
 
-                if (rowCounter >= GameGrid.gridRowSize)
+                if (row >= GameGrid.gridRowSize)
                 {
                     continue;
                 }
 
-                assert(rowCounter >= 0);
-                assert(rowCounter < GameGrid.gridRowSize);
+                assert(row >= 0);
+                assert(row < GameGrid.gridRowSize);
 
-                if (grid[colCounter][rowCounter] == State.Moving)
+                if (grid[col][row] == State.Moving)
                 {
-                    grid[colCounter+1][rowCounter] = State.Moving;
-                    grid[colCounter][rowCounter]   = State.Empty;
+                    grid[col+1][row] = State.Moving;
+                    grid[col][row]   = State.Empty;
                 }
             }
         }
@@ -99,37 +99,42 @@ struct GameGrid
         piecePosition.y++;
     }
 
-    // ------------------------------
+    // ----------------'--------------
     // turn every colliding piece into filled blocks
     //
     void stopPiece()
     {
-        for (int colCounter = piecePosition.y + pieceSquareSize; colCounter >= piecePosition.y; colCounter--)
+        const Vector2 offset = Vector2(
+            piecePosition.x + pieceSquareSize,
+            piecePosition.y + pieceSquareSize,
+        );
+
+        for (int col = offset.y; col >= piecePosition.y; col--)
         {
-            for (int rowCounter = piecePosition.x; rowCounter < piecePosition.x + pieceSquareSize; rowCounter++)
+            for (int row = piecePosition.x; row < offset.x; row++)
             {
 
-                if (rowCounter >= GameGrid.gridRowSize)
+                if (row >= GameGrid.gridRowSize)
                 {
                     continue;
                 }
 
-                if (colCounter >= GameGrid.gridColSize)
+                if (col >= GameGrid.gridColSize)
                 {
                     continue;
                 }
 
-                if (rowCounter < 0)
+                if (row < 0)
                 {
                     continue;
                 }
 
-                assert(rowCounter < GameGrid.gridRowSize);
-                assert(colCounter < GameGrid.gridColSize);
+                assert(row < GameGrid.gridRowSize);
+                assert(col < GameGrid.gridColSize);
 
-                if (grid[colCounter][rowCounter] == State.Moving)
+                if (grid[col][row] == State.Moving)
                 {
-                    grid[colCounter][rowCounter] = State.Full;
+                    grid[col][row] = State.Full;
                 }
             }
         }
@@ -160,21 +165,21 @@ struct GameGrid
     //
     bool hasDetectedCollision()
     {
-        for (int colCounter = piecePosition.y; colCounter < piecePosition.y + pieceSquareSize; colCounter++)
+        for (int col = piecePosition.y; col < piecePosition.y + pieceSquareSize; col++)
         {
-            for (int rowCounter = piecePosition.x; rowCounter < piecePosition.x + pieceSquareSize; rowCounter++)
+            for (int row = piecePosition.x; row < piecePosition.x + pieceSquareSize; row++)
             {
-                if (rowCounter >= GameGrid.gridRowSize)
+                if (row >= gridRowSize)
                 {
                     continue;
                 }
 
-                assert(rowCounter < GameGrid.gridRowSize);
+                assert(row < gridRowSize);
 
-                int lowerPiece            = grid[colCounter+1][rowCounter];
+                int lowerPiece            = grid[col+1][row];
                 bool isLowerPieceBlocking = lowerPiece == State.Block || lowerPiece == State.Full;
 
-                int current          = grid[colCounter][rowCounter];
+                int current          = grid[col][row];
                 bool isCurrentMoving = current == State.Moving;
 
                 if (isCurrentMoving && isLowerPieceBlocking)
@@ -237,19 +242,19 @@ struct GameGrid
     
         void markLineCompletion(int line)
         {
-            for (int colCounter = 1; colCounter < (gridRowSize-1); colCounter++)
+            for (int col = 1; col < (gridRowSize-1); col++)
             {
-                grid[line][colCounter] = State.Fading;
+                grid[line][col] = State.Fading;
             }
         }
-        for (int rowCounter = 1; rowCounter < (gridColSize - 1); rowCounter++)
+        for (int row = 1; row < (gridColSize - 1); row++)
         {
             bool hasFoundEmptySquare     = false;
             //bool hasFoundOnlyEmptySquare = true;
 
-            for (int colCounter = 1; colCounter < gridRowSize; colCounter++)
+            for (int col = 1; col < gridRowSize; col++)
             {
-                const auto current = grid[rowCounter][colCounter];
+                const auto current = grid[row][col];
 
                 //if (current == State.Full && hasFoundOnlyEmptySquare)
                 //{
@@ -263,7 +268,7 @@ struct GameGrid
 
                 if ((current == State.Block) && !hasFoundEmptySquare)
                 {
-                    markLineCompletion(rowCounter);
+                    markLineCompletion(row);
                 }
 
                 //if (current == State.Block && hasFoundOnlyEmptySquare)
@@ -274,34 +279,34 @@ struct GameGrid
 
     unittest
     {
-        GameGrid test_grid;
-        test_grid.init();
+        GameGrid testGrid;
+        testGrid.init();
 
-        for (int colCounter = 1; colCounter < 11; colCounter++)
+        for (int col = 1; col < 11; col++)
         {
-            test_grid.grid[18][colCounter] = State.Full;
+            testGrid.grid[18][col] = State.Full;
         }
 
-        for (int colCounter = 0; colCounter < GameGrid.gridRowSize; colCounter++)
+        for (int col = 0; col < gridRowSize; col++)
         {
-            assert(test_grid.grid[18][colCounter] != State.Empty);
+            assert(testGrid.grid[18][col] != State.Empty);
         }
         
-        test_grid.grid[17][2] = State.Full;
-        test_grid.grid[16][3] = State.Full;
+        testGrid.grid[17][2] = State.Full;
+        testGrid.grid[16][3] = State.Full;
         
-        test_grid.markCompletion();
+        testGrid.markCompletion();
 
         // -- assertions --
         import std.format;
 
-        for (int colCounter = 1; colCounter < (GameGrid.gridRowSize-1); colCounter++)
+        for (int col = 1; col < (gridRowSize-1); col++)
         {
-            const msg = format(">failed to assert colunm %d<", colCounter);
-            assert(test_grid.grid[18][colCounter] == State.Fading, msg);
+            const msg = format(">failed to assert colunm %d<", col);
+            assert(testGrid.grid[18][col] == State.Fading, msg);
         }
-        assert(test_grid.grid[17][2] == State.Full);
-        assert(test_grid.grid[16][3] == State.Full);
+        assert(testGrid.grid[17][2] == State.Full);
+        assert(testGrid.grid[16][3] == State.Full);
     }
 
     void copyRow(int sourceRowIndex, int destRowIndex)
@@ -309,9 +314,9 @@ struct GameGrid
         assert(sourceRowIndex >= 0);
         assert(destRowIndex   >= 0);
 
-        for (auto counter = 1; counter < (GameGrid.gridRowSize-1); counter++)
+        for (auto count = 1; count < (gridRowSize-1); count++)
         {
-            grid[destRowIndex][counter] = grid[sourceRowIndex][counter];
+            grid[destRowIndex][count] = grid[sourceRowIndex][count];
         }
     }
 
@@ -322,13 +327,13 @@ struct GameGrid
 
         // -=- initialize grid state -=-
 
-        testGrid.grid[18][8] = GameGrid.State.Full;
-        testGrid.grid[18][4] = GameGrid.State.Full;
-        testGrid.grid[18][3] = GameGrid.State.Full;
+        testGrid.grid[18][8] = State.Full;
+        testGrid.grid[18][4] = State.Full;
+        testGrid.grid[18][3] = State.Full;
         
-        testGrid.grid[17][3] = GameGrid.State.Full;
+        testGrid.grid[17][3] = State.Full;
 
-        testGrid.grid[16][6] = GameGrid.State.Full;
+        testGrid.grid[16][6] = State.Full;
 
         // -=- copy the row -=-
 
@@ -336,20 +341,20 @@ struct GameGrid
 
         // -=- assertions -=-
 
-        assert(testGrid.grid[18][8] == GameGrid.State.Empty);
-        assert(testGrid.grid[18][4] == GameGrid.State.Empty);
-        assert(testGrid.grid[18][3] == GameGrid.State.Empty);
-        assert(testGrid.grid[18][6] == GameGrid.State.Full);
+        assert(testGrid.grid[18][8] == State.Empty);
+        assert(testGrid.grid[18][4] == State.Empty);
+        assert(testGrid.grid[18][3] == State.Empty);
+        assert(testGrid.grid[18][6] == State.Full);
 
-        assert(testGrid.grid[17][3] == GameGrid.State.Full);
+        assert(testGrid.grid[17][3] == State.Full);
         
     }
     
     void clearRow(int row)
     {
-        for (auto counter = 1; counter < (GameGrid.gridRowSize-1); counter++)
+        for (auto count = 1; count < (gridRowSize-1); count++)
         {
-            grid[row][counter] = State.Empty;
+            grid[row][count] = State.Empty;
         }
     }
 
@@ -360,33 +365,32 @@ struct GameGrid
 
         // -=- initialize grid state -=-
         
-        testGrid.grid[18][8] = GameGrid.State.Full;
-        testGrid.grid[18][4] = GameGrid.State.Full;
-        testGrid.grid[18][3] = GameGrid.State.Full;
+        testGrid.grid[18][8] = State.Full;
+        testGrid.grid[18][4] = State.Full;
+        testGrid.grid[18][3] = State.Full;
         
-        testGrid.grid[17][3] = GameGrid.State.Full;
+        testGrid.grid[17][3] = State.Full;
 
         // -=- clear row -=-
 
         testGrid.clearRow(18);
 
         // -=- assertions -=-
-
-        for (int counter = 1; counter < (GameGrid.gridRowSize-1); counter++)
+        for (int count = 1; count < (gridRowSize-1); count++)
         {
-            assert(testGrid.grid[18][counter] == GameGrid.State.Empty);
+            assert(testGrid.grid[18][count] == State.Empty);
         }
 
-        assert(testGrid.grid[17][3] == GameGrid.State.Full);
+        assert(testGrid.grid[17][3] == State.Full);
         
     }
 
     bool isRowEmpty(uint row)
     {
-        for (auto counter = 0; counter < (gridRowSize-1); counter++)
+        for (auto count = 0; count < (gridRowSize-1); count++)
         {
-            const current = grid[row][counter];
-            if (current == GameGrid.State.Full || current == GameGrid.State.Fading)
+            const current = grid[row][count];
+            if (current == State.Full || current == State.Fading)
             {
                 return false;
             }
@@ -508,9 +512,9 @@ struct GameGrid
         GameGrid testGrid;
         testGrid.init();
 
-        for (int colCounter = 1; colCounter < 11; colCounter++)
+        for (int col = 1; col < 11; col++)
         {
-            testGrid.grid[18][colCounter] = State.Fading;
+            testGrid.grid[18][col] = State.Fading;
         }
         testGrid.grid[17][9] = State.Full;
         testGrid.grid[16][9] = State.Full;
@@ -546,17 +550,17 @@ struct GameGrid
         GameGrid testGrid;
         testGrid.init();
 
-        for (int colCounter = 1; colCounter < 11; colCounter++)
+        for (int col = 1; col < 11; col++)
         {
-            testGrid.grid[18][colCounter] = State.Fading;
+            testGrid.grid[18][col] = State.Fading;
         }
 
         testGrid.grid[17][9] = State.Full;
         testGrid.grid[16][9] = State.Full;
 
-        for (int colCounter = 1; colCounter < 11; colCounter++)
+        for (int col = 1; col < 11; col++)
         {
-            testGrid.grid[15][colCounter] = State.Fading;
+            testGrid.grid[15][col] = State.Fading;
         }
 
         testGrid.grid[14][9] = State.Full;
@@ -610,21 +614,21 @@ struct GameGrid
         testGrid.grid[14][2] = State.Full;
         testGrid.grid[14][8] = State.Full;
         
-        for (int colCounter = 1; colCounter < 11; colCounter++)
+        for (int col = 1; col < 11; col++)
         {
-            testGrid.grid[15][colCounter] = State.Fading;
+            testGrid.grid[15][col] = State.Fading;
         }
-        for (int colCounter = 1; colCounter < 11; colCounter++)
+        for (int col = 1; col < 11; col++)
         {
-            testGrid.grid[16][colCounter] = State.Fading;
+            testGrid.grid[16][col] = State.Fading;
         }
 
         testGrid.grid[17][8] = State.Full;
         testGrid.grid[17][9] = State.Full;
 
-        for (int colCounter = 1; colCounter < 11; colCounter++)
+        for (int col = 1; col < 11; col++)
         {
-            testGrid.grid[18][colCounter] = State.Fading;
+            testGrid.grid[18][col] = State.Fading;
         }
 
         // --- remove fading lines --- 
@@ -646,13 +650,13 @@ struct GameGrid
         GameGrid testGrid;
         testGrid.init();
 
-        for (int colCounter = 1; colCounter < (GameGrid.gridRowSize - 1); colCounter++)
+        for (int col = 1; col < (GameGrid.gridRowSize - 1); col++)
         {
-            testGrid.grid[18][colCounter] = State.Fading;
+            testGrid.grid[18][col] = State.Fading;
         }
-        for (int colCounter = 1; colCounter < (GameGrid.gridRowSize - 1); colCounter++)
+        for (int col = 1; col < (GameGrid.gridRowSize - 1); col++)
         {
-            testGrid.grid[17][colCounter] = State.Fading;
+            testGrid.grid[17][col] = State.Fading;
         }
 
         testGrid.removeFading();
@@ -670,31 +674,31 @@ struct GameGrid
         oppositeVertex.x = piecePosition.x + GameGrid.pieceSquareSize + direction;
         oppositeVertex.y = piecePosition.y + GameGrid.pieceSquareSize;
 
-        for (auto colCounter = piecePosition.y; colCounter < oppositeVertex.y; colCounter++)
+        for (auto col = piecePosition.y; col < oppositeVertex.y; col++)
         {
-            for (auto rowCounter = piecePosition.x; rowCounter <= oppositeVertex.x; rowCounter++)
+            for (auto row = piecePosition.x; row <= oppositeVertex.x; row++)
             {
-                if (rowCounter >= GameGrid.gridRowSize)
+                if (row >= GameGrid.gridRowSize)
                 {
                     continue;
                 }
 
-                if (rowCounter + direction < 0)
+                if (row + direction < 0)
                 {
                     continue;
                 }
 
-                if (rowCounter + direction >= GameGrid.gridRowSize)
+                if (row + direction >= GameGrid.gridRowSize)
                 {
                     continue;
                 }
 
-                assert(rowCounter >= 0);
-                assert(rowCounter + direction >= 0);
-                assert(rowCounter < GameGrid.gridRowSize);
+                assert(row >= 0);
+                assert(row + direction >= 0);
+                assert(row < GameGrid.gridRowSize);
 
-                const auto current         = grid[colCounter][rowCounter];
-                const auto next            = grid[colCounter][rowCounter + direction];
+                const auto current         = grid[col][row];
+                const auto next            = grid[col][row + direction];
                 const bool isNextBlocking  = next == State.Block || next == State.Full;
                 if (isNextBlocking && current == State.Moving)
                 {
@@ -740,13 +744,13 @@ struct GameGrid
 
         testGrid.piecePosition = piecePosition;
 
-        for (int colCounter = 1; colCounter < (GameGrid.gridRowSize - 2); colCounter++)
+        for (int col = 1; col < (GameGrid.gridRowSize - 2); col++)
         {
-            testGrid.grid[18][colCounter] = State.Full;
+            testGrid.grid[18][col] = State.Full;
         }
-        for (int rowCounter = 14; rowCounter < 18; rowCounter++)
+        for (int row = 14; row < 18; row++)
         {
-            testGrid.grid[rowCounter][5] = State.Full;
+            testGrid.grid[row][5] = State.Full;
         }
 
         testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
@@ -791,30 +795,30 @@ struct GameGrid
 
         void moveLeft()
         {
-            for (auto colCounter = piecePosition.y; colCounter < oppositeVertex.y; colCounter++)
+            for (auto col = piecePosition.y; col < oppositeVertex.y; col++)
             {
-                for (auto rowCounter = (oppositeVertex.x + 1); rowCounter > (piecePosition.x + 1); rowCounter--)
+                for (auto row = (oppositeVertex.x + 1); row > (piecePosition.x + 1); row--)
                 {
-                    if (rowCounter >= GameGrid.gridRowSize)
+                    if (row >= GameGrid.gridRowSize)
                     {
                         continue; 
                     }
 
-                    assert(rowCounter < GameGrid.gridRowSize);
+                    assert(row < GameGrid.gridRowSize);
 
-                    if (rowCounter <= 1)
+                    if (row <= 1)
                     {
                         continue;
                     }
 
                     // @ todo
-                    if (grid[colCounter][rowCounter - 1] != State.Moving)
+                    if (grid[col][row - 1] != State.Moving)
                     {
                         continue;
                     }
 
-                    grid[colCounter][rowCounter - 1] = State.Empty;
-                    grid[colCounter][rowCounter]     = State.Moving;
+                    grid[col][row - 1] = State.Empty;
+                    grid[col][row]     = State.Moving;
                 }
             }
         }
@@ -824,21 +828,21 @@ struct GameGrid
             assert(oppositeVertex.y     > 0);
             assert(oppositeVertex.x - 1 > 0);
 
-            for (auto colCounter = piecePosition.y; colCounter < oppositeVertex.y; colCounter++)
+            for (auto col = piecePosition.y; col < oppositeVertex.y; col++)
             {
-                for (auto rowCounter = piecePosition.x - 1; rowCounter < (oppositeVertex.x - 1); rowCounter++)
+                for (auto row = piecePosition.x - 1; row < (oppositeVertex.x - 1); row++)
                 {
-                    assert(colCounter >= 0);
-                    assert(rowCounter + 1 < GameGrid.gridRowSize);
+                    assert(col >= 0);
+                    assert(row + 1 < GameGrid.gridRowSize);
                     
                     // @ todo
-                    if (grid[colCounter][rowCounter + 1] != State.Moving)
+                    if (grid[col][row + 1] != State.Moving)
                     {
                         continue;
                     }
 
-                    grid[colCounter][rowCounter + 1] = State.Empty;
-                    grid[colCounter][rowCounter]     = State.Moving;
+                    grid[col][row + 1] = State.Empty;
+                    grid[col][row]     = State.Moving;
                 }
             }
         }
@@ -877,7 +881,7 @@ struct GameGrid
         assert(testGrid.piecePosition.x == (piecePosition.x + 1));
     }
 
-    int[][] getPieceSlice()
+    State[][] getPieceSlice()
     {
         int pieceSpaceHeight = pieceSquareSize;
         if (piecePosition.y + pieceSpaceHeight > GameGrid.gridColSize)
@@ -885,7 +889,7 @@ struct GameGrid
             pieceSpaceHeight = GameGrid.gridColSize - piecePosition.y;
         }
 
-        int[][] blocks = new int[][pieceSpaceHeight];
+        State[][] blocks = new State[][pieceSpaceHeight];
 
         int pieceSpaceWidth = piecePosition.x + pieceSquareSize;
         
@@ -1040,11 +1044,11 @@ struct GameGrid
           }
         }
 
-        for (int colCounter = 0; colCounter < gridColSize; colCounter++)
+        for (int col = 0; col < gridColSize; col++)
         {
-            for (int rowCounter = 0; rowCounter < gridRowSize; rowCounter++)
+            for (int row = 0; row < gridRowSize; row++)
             {
-                draw_block(grid[colCounter][rowCounter], squareSize, offset);
+                draw_block(grid[col][row], squareSize, offset);
                 offset.x += squareSize;
             }
 
