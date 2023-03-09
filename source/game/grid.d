@@ -1023,22 +1023,70 @@ struct GameGrid
           switch (state)
           {
           case State.Empty:
-            DrawLine(offset.x + squareSize, offset.y, offset.x + squareSize, offset.y + squareSize, Colors.LIGHTGRAY);
-            DrawLine(offset.x, offset.y + squareSize, offset.x + squareSize, offset.y + squareSize, Colors.LIGHTGRAY);
-            DrawLine(offset.x, offset.y, offset.x, offset.y + squareSize, Colors.LIGHTGRAY);
-            DrawLine(offset.x, offset.y, offset.x + squareSize, offset.y, Colors.LIGHTGRAY);
+            DrawLine(
+                offset.x + squareSize,
+                offset.y,
+                offset.x + squareSize,
+                offset.y + squareSize,
+                Colors.LIGHTGRAY
+            );
+            DrawLine(
+                offset.x,
+                offset.y + squareSize,
+                offset.x + squareSize,
+                offset.y + squareSize,
+                Colors.LIGHTGRAY
+            );
+            DrawLine(
+                offset.x,
+                offset.y,
+                offset.x,
+                offset.y + squareSize,
+                Colors.LIGHTGRAY
+            );
+            DrawLine(
+                offset.x,
+                offset.y,
+                offset.x + squareSize,
+                offset.y,
+                Colors.LIGHTGRAY
+            );
             break;
           case State.Full:
-            DrawRectangle(offset.x, offset.y, squareSize, squareSize, Colors.GRAY);
+            DrawRectangle(
+                offset.x,
+                offset.y,
+                squareSize,
+                squareSize,
+                Colors.GRAY
+            );
             break;
           case State.Block:
-            DrawRectangle(offset.x, offset.y, squareSize, squareSize, Colors.DARKGRAY);
+            DrawRectangle(
+                offset.x,
+                offset.y,
+                squareSize,
+                squareSize,
+                Colors.DARKGRAY
+            );
             break;
           case State.Moving:
-            DrawRectangle(offset.x, offset.y, squareSize, squareSize, Colors.LIME);
+            DrawRectangle(
+                offset.x,
+                offset.y,
+                squareSize,
+                squareSize,
+                Colors.LIME
+            );
             break;
           case State.Fading:
-            DrawRectangle(offset.x, offset.y, squareSize, squareSize, fadingColor);
+            DrawRectangle(
+                offset.x,
+                offset.y,
+                squareSize,
+                squareSize,
+                fadingColor
+            );
             break;
           default: assert(0);
           }
