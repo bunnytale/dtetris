@@ -9,7 +9,7 @@ struct Piece
     State[pieceLength][pieceLength][] layoutList;
 
     uint currentLayout;
-    
+
     void writeLayout(ref State[][] grid, in uint layout)
     {
         assert(layout < layoutList.length);
