@@ -8,7 +8,7 @@ import std.random;
 // -----------------------------------
 // generate pieces randomically
 //
-class PieceGenerator
+class PieceGenerator : PieceGenStrategy
 {
 	enum PieceShape
 	{
@@ -209,8 +209,11 @@ class PieceGenerator
 			};
 		}
 	}
+    
+    Piece getRandomPiece() =>
+        buildPiece(this.generatePieceShape());
 
-    auto generatePiece(in PieceShape shape)
+    auto buildPiece(in PieceShape shape)
     {
         Piece piece;
         pieceConfig[shape](piece.layoutList);
@@ -227,7 +230,7 @@ unittest
     auto generator = new PieceGenerator();
     
     const shape = generator.PieceShape.L;
-    auto piece = generator.generatePiece(shape);
+    auto piece = generator.buildPiece(shape);
 
     assert(piece.layoutList.length == 4);
     // @ todo : write better assertions

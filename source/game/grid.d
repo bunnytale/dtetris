@@ -34,6 +34,7 @@ struct GameGrid
 
     // actual grid which holds each square state
     State[gridRowSize][gridColSize] grid;
+    alias grid this;
   
     // piece width/height in number of square
     static const pieceSquareSize = 4;

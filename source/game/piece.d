@@ -2,6 +2,11 @@ module game.piece;
 
 import game.grid;
 
+interface PieceGenStrategy
+{
+    Piece getRandomPiece();
+}
+
 struct Piece
 {
     alias State       = GameGrid.State;

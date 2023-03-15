@@ -1,7 +1,10 @@
 module game;
 
 import raylib;
+
 import game.grid;
+import game.piece;
+import game.piece_generator;
 
 class Game
 {
@@ -22,29 +25,24 @@ class Game
     auto  fadeCounter  = 0;
     bool isBlockFading = false;
 
+    PieceGenStrategy generator;
+
     this()
     {
         grid.init();
 
+        initPieceGen(generator);
         spawnPiece();
-        
-        // --- debug ---
-       for (auto counter = 1; counter < 10; counter++)
-       {
-            grid.grid[18][counter] = grid.State.Full;
-       }
-       for (auto counter = 1; counter < 10; counter++)
-       {
-            grid.grid[17][counter] = grid.State.Full;
-       }
-       for (auto counter = 1; counter < 10; counter++)
-       {
-            grid.grid[16][counter] = grid.State.Full;
-       }
-       for (auto counter = 1; counter < 10; counter++)
-       {
-            grid.grid[15][counter] = grid.State.Full;
-       }
+    }
+
+    void initPieceGen(out PieceGenStrategy pieceGen)
+    {
+        import std.random;
+
+        immutable seed = 666;
+        const auto rand = Random(seed);
+
+        pieceGen = new PieceGenerator(rand);
     }
 
     void drawFrame()
@@ -120,16 +118,18 @@ class Game
 
     void executeLateralMove()
     {
-        const bool leftKeyPressed  = IsKeyPressed(KeyboardKey.KEY_LEFT);
-        const bool rightKeyPressed = IsKeyPressed(KeyboardKey.KEY_RIGHT);
+        const bool isLeftPressed  =
+            IsKeyPressed(KeyboardKey.KEY_LEFT);
+        const bool isRightPressed =
+            IsKeyPressed(KeyboardKey.KEY_RIGHT);
         
-        if (leftKeyPressed)
+        if (isLeftPressed)
         {
             if (!grid.canMoveHorizontally(-1))
                 return;
 
             grid.moveHorizontal(-1);
-        } else if (rightKeyPressed)
+        } else if (isRightPressed)
         {
             if (!grid.canMoveHorizontally(1))
                 return;
@@ -163,10 +163,15 @@ class Game
         const auto piecePosition = game.grid.Vector2(4, 0);
         grid.piecePosition = piecePosition;
 
-        grid.grid[piecePosition.y][piecePosition.x + 1]     = GameGrid.State.Moving;
-        grid.grid[piecePosition.y + 1][piecePosition.x + 1] = GameGrid.State.Moving;
-        grid.grid[piecePosition.y + 2][piecePosition.x + 1] = GameGrid.State.Moving;
-        grid.grid[piecePosition.y + 3][piecePosition.x + 1] = GameGrid.State.Moving;
+        const x = piecePosition.x;
+        const y = piecePosition.y;
+        with(GameGrid.State)
+        {
+            grid[y][x + 1]     = Moving;
+            grid[y + 1][x + 1] = Moving;
+            grid[y + 2][x + 1] = Moving;
+            grid[y + 3][x + 1] = Moving;
+        }
     }
 }
 
