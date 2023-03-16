@@ -9,6 +9,7 @@ import game.piece_generator;
 class Game
 {
     GameGrid grid;
+    Piece currentPiece;
 
     const lateralMoveTiming  = 5;
     auto  lateralMoveCounter = 0;
@@ -144,15 +145,10 @@ class Game
         const auto piecePosition = game.grid.Vector2(4, 0);
         grid.piecePosition = piecePosition;
 
-        const x = piecePosition.x;
-        const y = piecePosition.y;
-        with(GameGrid.State)
-        {
-            grid[y][x + 1]     = Moving;
-            grid[y + 1][x + 1] = Moving;
-            grid[y + 2][x + 1] = Moving;
-            grid[y + 3][x + 1] = Moving;
-        }
+        currentPiece = generator.getRandomPiece();
+
+        auto slices = grid.getPieceSlice();
+        currentPiece.writeLayout(slices, 0); 
     }
 }
 
