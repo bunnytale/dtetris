@@ -64,7 +64,7 @@ class PieceGenerator : PieceGenStrategy
 
 				grid = [
 					[
-						[Empty, Moving, Empty,  Empty],
+						[Empty, Empty,  Empty,  Empty],
 						[Empty, Moving, Empty,  Empty],
 						[Empty, Moving, Empty,  Empty],
 						[Empty, Moving, Moving, Empty],
@@ -96,7 +96,7 @@ class PieceGenerator : PieceGenStrategy
 
 				grid = [
 					[
-						[Empty, Empty,  Moving, Empty],
+						[Empty, Empty,  Empty,  Empty],
 						[Empty, Empty,  Moving, Empty],
 						[Empty, Empty,  Moving, Empty],
 						[Empty, Moving, Moving, Empty],
