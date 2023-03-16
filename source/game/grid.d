@@ -716,16 +716,21 @@ struct GameGrid
         testGrid.init();
 
         Vector2 piecePosition = Vector2(0, 4);
-
         testGrid.piecePosition = piecePosition;
 
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
-        testGrid.grid[piecePosition.y + 2][piecePosition.x + 1] = State.Moving;
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] = State.Moving;
-        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Moving;
+        immutable x = piecePosition.x;
+        immutable y = piecePosition.y;
 
-        assert(testGrid.grid[piecePosition.y + 1][piecePosition.x] == State.Block);
-        assert(testGrid.grid[piecePosition.y + 2][piecePosition.x] == State.Block);
+        with(State)
+        {
+            testGrid[y + 1][x + 1] = Moving;
+            testGrid[y + 2][x + 1] = Moving;
+            testGrid[y + 1][x + 2] = Moving;
+            testGrid[y + 2][x + 2] = Moving;
+
+            assert(testGrid[y + 1][x] == Block);
+            assert(testGrid[y + 2][x] == Block);
+        }
         
         bool canMoveLeft = testGrid.canMoveHorizontally(-1);
         assert(!canMoveLeft);
@@ -741,23 +746,28 @@ struct GameGrid
         testGrid.init();
 
         Vector2 piecePosition = Vector2(5, 14);
-        assert(piecePosition.x == 5);
 
         testGrid.piecePosition = piecePosition;
 
-        for (int col = 1; col < (GameGrid.gridRowSize - 2); col++)
-        {
-            testGrid.grid[18][col] = State.Full;
-        }
-        for (int row = 14; row < 18; row++)
-        {
-            testGrid.grid[row][5] = State.Full;
-        }
+        immutable x = piecePosition.x;
+        immutable y = piecePosition.y;
 
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
-        testGrid.grid[piecePosition.y + 2][piecePosition.x + 1] = State.Moving;
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] = State.Moving;
-        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Moving;
+        with(State)
+        {
+            for (int col = 1; col < (this.gridRowSize - 2); col++)
+            {
+                testGrid[18][col] = Full;
+            }
+            for (int row = 14; row < 18; row++)
+            {
+                testGrid[row][5] = Full;
+            }
+
+            testGrid[y + 1][x + 1] = Moving;
+            testGrid[y + 2][x + 1] = Moving;
+            testGrid[y + 1][x + 2] = Moving;
+            testGrid[y + 2][x + 2] = Moving;
+        }
 
         bool canMoveLeft = testGrid.canMoveHorizontally(-1);
         assert(!canMoveLeft);
@@ -773,13 +783,18 @@ struct GameGrid
         testGrid.init();
 
         Vector2 piecePosition = Vector2(8, 14);
-
         testGrid.piecePosition = piecePosition;
 
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
-        testGrid.grid[piecePosition.y + 2][piecePosition.x + 1] = State.Moving;
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] = State.Moving;
-        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Moving;
+        immutable x = piecePosition.x;
+        immutable y = piecePosition.y;
+        
+        with(State)
+        {
+            testGrid[y + 1][x + 1] = Moving;
+            testGrid[y + 2][x + 1] = Moving;
+            testGrid[y + 1][x + 2] = Moving;
+            testGrid[y + 2][x + 2] = Moving;
+        }
 
         bool canMoveLeft = testGrid.canMoveHorizontally(-1);
         assert(canMoveLeft);
@@ -864,22 +879,27 @@ struct GameGrid
         testGrid.init();
 
         Vector2 piecePosition = Vector2(5, 14);
-
         testGrid.piecePosition = piecePosition;
 
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
-        testGrid.grid[piecePosition.y + 2][piecePosition.x + 1] = State.Moving;
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] = State.Moving;
-        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Moving;
+        immutable x = piecePosition.x;
+        immutable y = piecePosition.y;
+        
+        with(State)
+        {
+            testGrid[y + 1][x + 1] = Moving;
+            testGrid[y + 2][x + 1] = Moving;
+            testGrid[y + 1][x + 2] = Moving;
+            testGrid[y + 2][x + 2] = Moving;
 
-        testGrid.moveHorizontal(1);
+            testGrid.moveHorizontal(1);
 
-        assert(testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] == State.Moving);
-        assert(testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] == State.Moving);
-        assert(testGrid.grid[piecePosition.y + 1][piecePosition.x + 3] == State.Moving);
-        assert(testGrid.grid[piecePosition.y + 2][piecePosition.x + 3] == State.Moving);
+            assert(testGrid[y + 1][x + 2] == Moving);
+            assert(testGrid[y + 2][x + 2] == Moving);
+            assert(testGrid[y + 1][x + 3] == Moving);
+            assert(testGrid[y + 2][x + 3] == Moving);
 
-        assert(testGrid.piecePosition.x == (piecePosition.x + 1));
+            assert(testGrid.piecePosition.x == (x + 1));
+        }
     }
 
     State[][] getPieceSlice()
@@ -923,17 +943,23 @@ struct GameGrid
         Vector2 piecePosition  = Vector2(5, 16);
         testGrid.piecePosition = piecePosition;
          
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
-        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Full;
+        immutable x = piecePosition.x;
+        immutable y = piecePosition.y;
 
-        const auto pieceSpace = testGrid.getPieceSlice();
-
-        assert(pieceSpace[1][1] == State.Moving);
-        assert(pieceSpace[2][2] == State.Full);
-
-        foreach (element; pieceSpace[3])
+        with(State)
         {
-            assert(element == State.Block);
+            testGrid[y + 1][x + 1] = Moving;
+            testGrid[y + 2][x + 2] = Full;
+
+            const auto pieceSpace = testGrid.getPieceSlice();
+
+            assert(pieceSpace[1][1] == Moving);
+            assert(pieceSpace[2][2] == Full);
+
+            foreach (element; pieceSpace[3])
+            {
+                assert(element == Block);
+            }
         }
     }
 
@@ -944,24 +970,30 @@ struct GameGrid
 
         Vector2 piecePosition  = Vector2(9, 16);
         testGrid.piecePosition = piecePosition;
+
+        immutable x = piecePosition.x;
+        immutable y = piecePosition.y;
          
-        testGrid.grid[piecePosition.y][piecePosition.x]         = State.Moving;
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Full;
-
-        const auto pieceSpace = testGrid.getPieceSlice();
-
-        assert(pieceSpace[0][0] == State.Moving);
-        assert(pieceSpace[1][1] == State.Full);
-
-        foreach (row; pieceSpace)
+        with(State)
         {
-            assert(row[$ - 1] == State.Block);
-            assert(row.length == 3);
-        }
-        
-        foreach (element; pieceSpace[3])
-        {
-            assert(element == State.Block);
+            testGrid[y][x]         = Moving;
+            testGrid[y + 1][x + 1] = Full;
+
+            const auto pieceSpace = testGrid.getPieceSlice();
+
+            assert(pieceSpace[0][0] == Moving);
+            assert(pieceSpace[1][1] == Full);
+
+            foreach (row; pieceSpace)
+            {
+                assert(row[$ - 1] == Block);
+                assert(row.length == 3);
+            }
+            
+            foreach (element; pieceSpace[3])
+            {
+                assert(element == Block);
+            }
         }
     }
 
@@ -972,24 +1004,30 @@ struct GameGrid
 
         Vector2 piecePosition  = Vector2(-1, 16);
         testGrid.piecePosition = piecePosition;
-         
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] = State.Moving;
-        testGrid.grid[piecePosition.y + 2][piecePosition.x + 3] = State.Full;
 
-        const auto pieceSpace = testGrid.getPieceSlice();
+        immutable x = piecePosition.x;
+        immutable y = piecePosition.y;
 
-        assert(pieceSpace[1][1] == State.Moving);
-        assert(pieceSpace[2][2] == State.Full);
-
-        foreach (row; pieceSpace)
+        with(State)
         {
-            assert(row[0] == State.Block);
-            assert(row.length == 3);
-        }
-        
-        foreach (element; pieceSpace[3])
-        {
-            assert(element == State.Block);
+            testGrid[y + 1][x + 2] = Moving;
+            testGrid[y + 2][x + 3] = Full;
+
+            const auto pieceSpace = testGrid.getPieceSlice();
+
+            assert(pieceSpace[1][1] == Moving);
+            assert(pieceSpace[2][2] == Full);
+
+            foreach (row; pieceSpace)
+            {
+                assert(row[0] == Block);
+                assert(row.length == 3);
+            }
+            
+            foreach (element; pieceSpace[3])
+            {
+                assert(element == Block);
+            }
         }
     }
 
@@ -1000,14 +1038,21 @@ struct GameGrid
 
         Vector2 piecePosition  = Vector2(5, 16);
         testGrid.piecePosition = piecePosition;
+
+        immutable x = piecePosition.x;
+        immutable y = piecePosition.y;
          
-        testGrid.grid[piecePosition.y + 1][piecePosition.x + 1] = State.Moving;
-        testGrid.grid[piecePosition.y + 2][piecePosition.x + 2] = State.Full;
+        with(State)
+        {
+            testGrid[y + 1][x + 1] = Moving;
+            testGrid[y + 2][x + 2] = Full;
 
-        auto pieceSpace = testGrid.getPieceSlice();
+            auto pieceSpace = testGrid.getPieceSlice();
 
-        pieceSpace[1][2] = State.Moving;
-        assert(testGrid.grid[piecePosition.y + 1][piecePosition.x + 2] == State.Moving);
+            pieceSpace[1][2] = Moving;
+
+            assert(testGrid[y + 1][x + 2] == Moving);
+        }
     }
 
     void draw()
@@ -1019,7 +1064,7 @@ struct GameGrid
 
         const control = offset.x;
 
-        void draw_block(int state, int size , immutable Vector2 offset)
+        void drawBlock(int state, int size , immutable Vector2 offset)
         {
             immutable x = offset.x;
             immutable y = offset.y;
@@ -1069,7 +1114,7 @@ struct GameGrid
         {
             for (int row = 0; row < gridRowSize; row++)
             {
-                draw_block(grid[col][row], squareSize, offset);
+                drawBlock(grid[col][row], squareSize, offset);
                 offset.x += squareSize;
             }
 
