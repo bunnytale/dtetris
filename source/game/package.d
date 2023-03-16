@@ -10,12 +10,12 @@ class Game
 {
     GameGrid grid;
 
-    const lateralMovementTiming  = 5;
-    auto  lateralMovementCounter = 0;
+    const lateralMoveTiming  = 5;
+    auto  lateralMoveCounter = 0;
 
-    int pieceGravityTiming      = 40;
-    int gravityTime             = 0;
-    const fastFallGravityTiming = 5;
+    int pieceFallTiming  = 40;
+    int gravityTime      = 0;
+    const fastFallTiming = 5;
 
     int respawnTiming    = 120;
     int spawnTimeCounter = 0;
@@ -39,6 +39,7 @@ class Game
     {
         import std.random;
 
+        /// @ todo : write code to get random seed from system
         immutable seed = 666;
         const auto rand = Random(seed);
 
@@ -93,10 +94,10 @@ class Game
         }
 
         const isFastFallActive = IsKeyDown(KeyboardKey.KEY_DOWN);
-        if (gravityTime >= pieceGravityTiming && !isFastFallActive)
+        if (gravityTime >= pieceFallTiming && !isFastFallActive)
         {
             gravityTime = 0;
-        } else if (gravityTime >= fastFallGravityTiming && isFastFallActive)
+        } else if (gravityTime >= fastFallTiming && isFastFallActive)
         {
             gravityTime = 0;
         } else {
@@ -136,26 +137,6 @@ class Game
 
             grid.moveHorizontal(1);
         }
-
-        /* if (leftKeyPressed) */
-        /* { */
-        /*     lateralMovementCounter += 1; */
-        /* } else if (rightKeyPressed) */
-        /* { */
-        /*     lateralMovementCounter += 1; */
-        /* } else { */
-        /*     lateralMovementCounter = 0; */
-        /* } */
-
-        /* const bool isLateralMoveCounterTimeout = lateralMovementCounter > lateralMovementTiming; */
-        /* if (isLateralMoveCounterTimeout && leftKeyPressed) { */
-        /*     grid.moveHorizontal(-1); */
-        /*     lateralMovementCounter = 0; */
-        /* } else */
-        /* if (isLateralMoveCounterTimeout && rightKeyPressed) { */
-        /*     grid.moveHorizontal(1); */
-        /*     lateralMovementCounter = 0; */
-        /* } */
     }
 
     void spawnPiece()
