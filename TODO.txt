@@ -10,6 +10,6 @@
 - rewrite markCompletion method
 - write a rule to detect when the game is over
 - make simple fade animtion for fading lines
-- create a mechanics to get a random piece;
++ create a mechanics to get a random piece;
 + create a method to get the area of the piece
 - create a controller to rotate the piece

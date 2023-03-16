@@ -1019,79 +1019,51 @@ struct GameGrid
 
         const control = offset.x;
 
-        void draw_block(int state, int size , Vector2 offset)
+        void draw_block(int state, int size , immutable Vector2 offset)
         {
-          switch (state)
-          {
-          case State.Empty:
-            DrawLine(
-                offset.x + squareSize,
-                offset.y,
-                offset.x + squareSize,
-                offset.y + squareSize,
-                Colors.LIGHTGRAY
-            );
-            DrawLine(
-                offset.x,
-                offset.y + squareSize,
-                offset.x + squareSize,
-                offset.y + squareSize,
-                Colors.LIGHTGRAY
-            );
-            DrawLine(
-                offset.x,
-                offset.y,
-                offset.x,
-                offset.y + squareSize,
-                Colors.LIGHTGRAY
-            );
-            DrawLine(
-                offset.x,
-                offset.y,
-                offset.x + squareSize,
-                offset.y,
-                Colors.LIGHTGRAY
-            );
+            immutable x = offset.x;
+            immutable y = offset.y;
+
+            switch (state)
+            {
+            case State.Empty:
+                DrawLine(
+                    x + size, y, x + size, y + size, Colors.LIGHTGRAY
+                );
+                DrawLine(
+                    x, y + size, x + size, y + size, Colors.LIGHTGRAY
+                );
+                DrawLine(
+                    x, y, x, y + size, Colors.LIGHTGRAY
+                );
+                DrawLine(
+                    x, y, x + size, y, Colors.LIGHTGRAY
+                );
             break;
-          case State.Full:
-            DrawRectangle(
-                offset.x,
-                offset.y,
-                squareSize,
-                squareSize,
-                Colors.GRAY
-            );
+            case State.Full:
+                DrawRectangle(
+                    x, y, size, size, Colors.GRAY
+                );
             break;
-          case State.Block:
-            DrawRectangle(
-                offset.x,
-                offset.y,
-                squareSize,
-                squareSize,
-                Colors.DARKGRAY
-            );
+            case State.Block:
+                DrawRectangle(
+                    x, y, size, size, Colors.DARKGRAY
+                );
             break;
-          case State.Moving:
-            DrawRectangle(
-                offset.x,
-                offset.y,
-                squareSize,
-                squareSize,
-                Colors.LIME
-            );
+            case State.Moving:
+                DrawRectangle(
+                    x, y, size, size, Colors.LIME
+                );
             break;
-          case State.Fading:
-            DrawRectangle(
-                offset.x,
-                offset.y,
-                squareSize,
-                squareSize,
-                fadingColor
-            );
+            case State.Fading:
+                DrawRectangle(
+                    x, y, size, size, fadingColor
+                );
             break;
-          default: assert(0);
-          }
+            default: assert(0);
+            }
         }
+    
 
         for (int col = 0; col < gridColSize; col++)
         {
