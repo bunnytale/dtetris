@@ -51,7 +51,12 @@ struct GameGrid
         {
             for (int row = 0; row < gridRowSize; row++)
             {
-                if (col == (gridColSize - 1) || row == (gridRowSize - 1) || row == 0)
+                if (col == (gridColSize - 1))
+                {
+                    grid[col][row] = State.Block;
+                    continue;
+                }
+                if (row == (gridRowSize - 1) || row == 0)
                 {
                     grid[col][row] = State.Block;
                     continue;
@@ -67,27 +72,25 @@ struct GameGrid
     //
     void moveVertical()
     {
-        for (int col = piecePosition.y + pieceSquareSize; col >= piecePosition.y; col--)
+        immutable x = piecePosition.x;
+        immutable y = piecePosition.y;
+
+        for (int col = y + pieceSquareSize; col >= y; col--)
         {
-            for (int row = piecePosition.x; row < piecePosition.x + pieceSquareSize; row++)
+            for (int row = x; row < x + pieceSquareSize; row++)
             {
-                if (col < 0)
-                {
-                    continue;
-                }
-                
-                if (col >= GameGrid.gridColSize)
+                if (col >= gridColSize || col < 0)
                 {
                     continue;
                 }
 
-                if (row >= GameGrid.gridRowSize)
+                if (row >= gridRowSize)
                 {
                     continue;
                 }
 
                 assert(row >= 0);
-                assert(row < GameGrid.gridRowSize);
+                assert(row < gridRowSize);
 
                 if (grid[col][row] == State.Moving)
                 {
@@ -98,6 +101,11 @@ struct GameGrid
         }
 
         piecePosition.y++;
+    }
+
+    unittest
+    {
+        // @ TODO : write this test case
     }
 
     // ----------------'--------------

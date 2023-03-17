@@ -248,7 +248,8 @@ unittest
 	{
 		PieceShape[] expectedResults = [L, Z, Z, I];
 
-		for (auto count = 0; count < expectedResults.length; count++)
+        immutable length = expectedResults.length;
+		for (auto count = 0; count < length; count++)
 		{
 			auto result = gen.generatePieceShape();
 			assert(result == expectedResults[count]);

@@ -2,8 +2,8 @@ module game;
 
 import raylib;
 
-import game.grid;
-import game.piece;
+import game.grid: GameGrid, Vector2;
+import game.piece: PieceGenStrategy, Piece;
 import game.piece_generator;
 
 class Game
@@ -142,7 +142,7 @@ class Game
 
     void spawnPiece()
     {
-        const auto piecePosition = game.grid.Vector2(4, 0);
+        const auto piecePosition = Vector2(4, 0);
         grid.piecePosition = piecePosition;
 
         currentPiece = generator.getRandomPiece();
