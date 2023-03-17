@@ -448,14 +448,14 @@ struct GameGrid
 
         // -=- initialize game grid -=-
 
-        testGrid.grid[18][1] = GameGrid.State.Full;
-        testGrid.grid[17][2] = GameGrid.State.Full;
-        testGrid.grid[16][3] = GameGrid.State.Full;
-        testGrid.grid[15][4] = GameGrid.State.Full;
-        testGrid.grid[14][5] = GameGrid.State.Full;
-        testGrid.grid[13][6] = GameGrid.State.Full;
-        testGrid.grid[12][7] = GameGrid.State.Full;
-        testGrid.grid[11][8] = GameGrid.State.Full;
+        testGrid.grid[18][1] = State.Full;
+        testGrid.grid[17][2] = State.Full;
+        testGrid.grid[16][3] = State.Full;
+        testGrid.grid[15][4] = State.Full;
+        testGrid.grid[14][5] = State.Full;
+        testGrid.grid[13][6] = State.Full;
+        testGrid.grid[12][7] = State.Full;
+        testGrid.grid[11][8] = State.Full;
 
         // -=- call method -=-
 
@@ -815,27 +815,25 @@ struct GameGrid
 
     void moveHorizontal(int direction)
     {
-        Vector2 oppositeVertex;
-        oppositeVertex.x =  piecePosition.x + GameGrid.pieceSquareSize + direction;
-        oppositeVertex.y =  piecePosition.y + GameGrid.pieceSquareSize;
+        const x = piecePosition.x;
+        const y = piecePosition.y;
+
+        Vector2 opposite;
+        opposite.x = x + GameGrid.pieceSquareSize + direction;
+        opposite.y = y + GameGrid.pieceSquareSize;
 
         void moveLeft()
         {
-            for (auto col = piecePosition.y; col < oppositeVertex.y; col++)
+            for (int col = y; col < opposite.y; col++)
             {
-                for (auto row = (oppositeVertex.x + 1); row > (piecePosition.x + 1); row--)
+                for (int row = opposite.x + 1; row >= x; row--)
                 {
-                    if (row >= GameGrid.gridRowSize)
+                    if (row >= gridRowSize || row <= 1)
                     {
                         continue; 
                     }
 
-                    assert(row < GameGrid.gridRowSize);
-
-                    if (row <= 1)
-                    {
-                        continue;
-                    }
+                    assert(row < gridRowSize);
 
                     // @ todo
                     if (grid[col][row - 1] != State.Moving)
@@ -851,15 +849,15 @@ struct GameGrid
 
         void moveRight()
         {
-            assert(oppositeVertex.y     > 0);
-            assert(oppositeVertex.x - 1 > 0);
+            assert(opposite.y     > 0);
+            assert(opposite.x - 1 > 0);
 
-            for (auto col = piecePosition.y; col < oppositeVertex.y; col++)
+            for (int col = y; col < opposite.y; col++)
             {
-                for (auto row = piecePosition.x - 1; row < (oppositeVertex.x - 1); row++)
+                for (auto row = x - 1; row <= opposite.x; row++)
                 {
                     assert(col >= 0);
-                    assert(row + 1 < GameGrid.gridRowSize);
+                    assert(row + 1 < gridRowSize);
                     
                     // @ todo
                     if (grid[col][row + 1] != State.Moving)
