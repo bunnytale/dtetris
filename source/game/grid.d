@@ -680,14 +680,14 @@ struct GameGrid
     bool canMoveHorizontally(const short direction)
     {
         Vector2 oppositeVertex;
-        oppositeVertex.x = piecePosition.x + GameGrid.pieceSquareSize + direction;
-        oppositeVertex.y = piecePosition.y + GameGrid.pieceSquareSize;
+        oppositeVertex.x = piecePosition.x + pieceSquareSize + direction;
+        oppositeVertex.y = piecePosition.y + pieceSquareSize;
 
         for (auto col = piecePosition.y; col < oppositeVertex.y; col++)
         {
             for (auto row = piecePosition.x; row <= oppositeVertex.x; row++)
             {
-                if (row >= GameGrid.gridRowSize)
+                if (row >= gridRowSize)
                 {
                     continue;
                 }
@@ -697,18 +697,20 @@ struct GameGrid
                     continue;
                 }
 
-                if (row + direction >= GameGrid.gridRowSize)
+                if (row + direction >= gridRowSize)
                 {
                     continue;
                 }
 
                 assert(row >= 0);
                 assert(row + direction >= 0);
-                assert(row < GameGrid.gridRowSize);
+                assert(row < gridRowSize);
 
-                const auto current         = grid[col][row];
-                const auto next            = grid[col][row + direction];
-                const bool isNextBlocking  = next == State.Block || next == State.Full;
+                const auto current = grid[col][row];
+                const auto next    = grid[col][row + direction];
+                const bool isNextBlocking =
+                    next == State.Block || next == State.Full;
+
                 if (isNextBlocking && current == State.Moving)
                 {
                     return false;
@@ -880,6 +882,34 @@ struct GameGrid
 
         piecePosition.x += direction;
     }
+
+    unittest
+    {
+        GameGrid testGrid;
+        testGrid.init();
+
+        Vector2 piecePosition = Vector2(0, 4);
+        testGrid.piecePosition = piecePosition;
+
+        immutable x = piecePosition.x;
+        immutable y = piecePosition.y;
+        
+        with(State)
+        {
+            testGrid[y + 1][x + 2] = Moving;
+            testGrid[y + 2][x + 1] = Moving;
+            testGrid[y + 2][x + 2] = Moving;
+            testGrid[y + 2][x + 3] = Moving;
+
+            testGrid.moveHorizontal(-1);
+
+            assert(testGrid[y + 1][x + 1] == Moving);
+            assert(testGrid[y + 2][x]     == Moving);
+            assert(testGrid[y + 2][x + 1] == Moving);
+            assert(testGrid[y + 2][x + 2] == Moving);
+        }
+    }
+
 
     unittest
     {
