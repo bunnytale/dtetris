@@ -84,6 +84,13 @@ class Game
             return;
         }
 
+        const isTurnPressed = IsKeyPressed(KeyboardKey.KEY_UP);
+        if(isTurnPressed)
+        {
+          turnPiece();
+        }
+
+
         executeLateralMove();
 
         if (!isPieceFalling && isSpawnTimerOver)
@@ -138,6 +145,17 @@ class Game
 
             grid.moveHorizontal(1);
         }
+    }
+
+    void turnPiece()
+    {
+        auto slices = grid.getPieceSlice();
+
+        currentPiece.currentLayout =
+           (currentPiece.currentLayout + 1) % currentPiece.layoutList.length;
+
+        Piece.clearGrid(slices);
+        currentPiece.writeLayout(slices, currentPiece.currentLayout);
     }
 
     void spawnPiece()

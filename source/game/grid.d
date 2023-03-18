@@ -161,10 +161,13 @@ struct GameGrid
 
         testGrid.stopPiece();
         
-        assert(testGrid.grid[18][5] == State.Full);
-        assert(testGrid.grid[19][5] == State.Block);
-        assert(testGrid.grid[18][6] == State.Empty);
-        assert(testGrid.grid[17][5] == State.Empty);
+        with(State)
+        {
+            assert(testGrid[18][5] == Full);
+            assert(testGrid[19][5] == Block);
+            assert(testGrid[18][6] == Empty);
+            assert(testGrid[17][5] == Empty);
+        }
     }
     
     // ------------------------------
@@ -174,9 +177,12 @@ struct GameGrid
     //
     bool hasDetectedCollision()
     {
-        for (int col = piecePosition.y; col < piecePosition.y + pieceSquareSize; col++)
+        immutable x = piecePosition.x;
+        immutable y = piecePosition.y;
+
+        for (int col = y; col < y + pieceSquareSize; col++)
         {
-            for (int row = piecePosition.x; row < piecePosition.x + pieceSquareSize; row++)
+            for (int row = x; row < x + pieceSquareSize; row++)
             {
                 if (row >= gridRowSize)
                 {
@@ -186,7 +192,8 @@ struct GameGrid
                 assert(row < gridRowSize);
 
                 int lowerPiece            = grid[col+1][row];
-                bool isLowerPieceBlocking = lowerPiece == State.Block || lowerPiece == State.Full;
+                bool isLowerPieceBlocking =
+                    lowerPiece == State.Block || lowerPiece == State.Full;
 
                 int current          = grid[col][row];
                 bool isCurrentMoving = current == State.Moving;
@@ -601,9 +608,9 @@ struct GameGrid
     {
         if (completedAllRows())
         {
-            for (auto counter = (GameGrid.gridColSize-2); counter > 0; counter--)
+            for (auto count = (gridColSize-2); count > 0; count--)
             {
-                clearRow(counter);
+                clearRow(count);
             }
         }
 
