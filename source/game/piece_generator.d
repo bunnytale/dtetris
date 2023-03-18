@@ -64,7 +64,7 @@ class PieceGenerator : PieceGenStrategy
 
 				grid = [
 					[
-						[Empty, Moving, Empty,  Empty],
+						[Empty, Empty,  Empty,  Empty],
 						[Empty, Moving, Empty,  Empty],
 						[Empty, Moving, Empty,  Empty],
 						[Empty, Moving, Moving, Empty],
@@ -79,7 +79,7 @@ class PieceGenerator : PieceGenStrategy
 						[Empty, Moving, Moving, Empty],
 						[Empty, Empty,  Moving, Empty],
 						[Empty, Empty,  Moving, Empty],
-						[Empty, Empty,  Moving, Empty],
+						[Empty, Empty,  Empty,  Empty],
 					],
 					[
 						[Empty, Empty,  Empty,  Empty],
@@ -96,7 +96,7 @@ class PieceGenerator : PieceGenStrategy
 
 				grid = [
 					[
-						[Empty, Empty,  Moving, Empty],
+						[Empty, Empty,  Empty,  Empty],
 						[Empty, Empty,  Moving, Empty],
 						[Empty, Empty,  Moving, Empty],
 						[Empty, Moving, Moving, Empty],
@@ -111,7 +111,7 @@ class PieceGenerator : PieceGenStrategy
 						[Empty, Moving, Moving, Empty],
 						[Empty, Moving, Empty,  Empty],
 						[Empty, Moving, Empty,  Empty],
-						[Empty, Moving, Empty,  Empty],
+						[Empty, Empty,  Empty,  Empty],
 					],
 					[
 						[Empty,  Empty,  Empty,  Empty],
@@ -248,7 +248,8 @@ unittest
 	{
 		PieceShape[] expectedResults = [L, Z, Z, I];
 
-		for (auto count = 0; count < expectedResults.length; count++)
+        immutable length = expectedResults.length;
+		for (auto count = 0; count < length; count++)
 		{
 			auto result = gen.generatePieceShape();
 			assert(result == expectedResults[count]);

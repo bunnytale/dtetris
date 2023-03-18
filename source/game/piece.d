@@ -15,6 +15,27 @@ struct Piece
 
     uint currentLayout;
 
+    bool canWriteLayout(State[][] grid, in uint layout)
+    {
+        for (auto col = 0; col < grid.length; col++)
+        {
+            for (auto row = 0; row < grid[col].length; row++)
+            {
+                const element = grid[col][row];
+
+                with(State)
+                {
+                    if (element == Full || element == Block)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     void writeLayout(ref State[][] grid, in uint layout)
     {
         assert(layout < layoutList.length);
@@ -23,71 +44,78 @@ struct Piece
         {
             for (auto row = 0; row < grid[col].length; row++)
             {
-                if(layoutList[layout][col][row] == State.Empty)
+                with (State)
                 {
-                    continue;
-                }
+                    if(layoutList[layout][col][row] == Empty)
+                    {
+                        continue;
+                    }
 
-                const element = grid[col][row];
-                if (element == State.Full || element == State.Block)
-                {
-                    /// @todo : refactory this code later
-                    assert(0);
+                    const element = grid[col][row];
+                    if (element == Full || element == Block)
+                    {
+                        /// @todo : refactory this code later
+                        assert(0);
+                    }
+                    grid[col][row] = Moving;
                 }
-                grid[col][row] = State.Moving;
             }
         }
     }
 
     unittest
     {
+        immutable length = pieceLength;
         Piece testPiece;
         with(testPiece)
-            layoutList = new State[pieceLength][pieceLength][2];
+            layoutList = new State[length][length][2];
 
-        /// write piece layouts
-        for (auto col = 0; col < pieceLength; col++)
+        with(testPiece)
         {
-            testPiece.layoutList[0][2][col] = State.Moving;
-        }
+            /// write piece layouts
+            for (auto col = 0; col < length; col++)
+            {
+                layoutList[0][2][col] = State.Moving;
+            }
 
-        for (auto row = 0; row < pieceLength; row++)
-        {
-            testPiece.layoutList[1][row][1] = State.Moving;
-        }
-        
-        State[][] fstLayout = new State[][pieceLength];
-        for (auto col = 0; col < pieceLength; col++)
-        {
-            fstLayout[col] = new State[pieceLength];
-        }
+            for (auto row = 0; row < length; row++)
+            {
+                layoutList[1][row][1] = State.Moving;
+            }
+            
+            State[][] fstLayout = new State[][length];
+            for (auto col = 0; col < length; col++)
+            {
+                fstLayout[col] = new State[length];
+            }
 
-        testPiece.writeLayout(fstLayout, cast(uint) 0);
+            testPiece.writeLayout(fstLayout, cast(uint) 0);
 
-        State[][] sndLayout = new State[][pieceLength];
-        for (auto col = 0; col < pieceLength; col++)
-        {
-            sndLayout[col] = new State[pieceLength];
-        }
+            State[][] sndLayout = new State[][length];
+            for (auto col = 0; col < length; col++)
+            {
+                sndLayout[col] = new State[length];
+            }
 
-        testPiece.writeLayout(sndLayout, cast(uint) 1);
+            testPiece.writeLayout(sndLayout, cast(uint) 1);
 
-        /// make assertions
+            /// make assertions
 
-        for (auto col = 0; col < pieceLength; col++)
-        {
-            assert(fstLayout[0][col] == State.Empty);
-            assert(fstLayout[1][col] == State.Empty);
-            assert(fstLayout[2][col] == State.Moving);
-            assert(fstLayout[3][col] == State.Empty);
-        }
+            for (auto col = 0; col < length; col++)
+            {
+                assert(fstLayout[0][col] == State.Empty);
+                assert(fstLayout[1][col] == State.Empty);
+                assert(fstLayout[2][col] == State.Moving);
+                assert(fstLayout[3][col] == State.Empty);
+            }
 
-        for (auto row = 0; row < pieceLength; row++)
-        {
-            assert(sndLayout[row][0] == State.Empty);
-            assert(sndLayout[row][1] == State.Moving);
-            assert(sndLayout[row][2] == State.Empty);
-            assert(sndLayout[row][3] == State.Empty);
+            for (auto row = 0; row < length; row++)
+            {
+                assert(sndLayout[row][0] == State.Empty);
+                assert(sndLayout[row][1] == State.Moving);
+                assert(sndLayout[row][2] == State.Empty);
+                assert(sndLayout[row][3] == State.Empty);
+            }
         }
     }
 

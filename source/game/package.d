@@ -2,20 +2,23 @@ module game;
 
 import raylib;
 
-import game.grid;
-import game.piece;
+import game.grid: GameGrid, Vector2;
+import game.piece: PieceGenStrategy, Piece;
 import game.piece_generator;
 
 class Game
 {
     GameGrid grid;
+    Piece currentPiece;
 
-    const lateralMovementTiming  = 5;
-    auto  lateralMovementCounter = 0;
+    bool isGameRunning;
 
-    int pieceGravityTiming      = 40;
-    int gravityTime             = 0;
-    const fastFallGravityTiming = 5;
+    const lateralMoveTiming  = 5;
+    auto  lateralMoveCounter = 0;
+
+    int pieceFallTiming  = 40;
+    int gravityTime      = 0;
+    const fastFallTiming = 5;
 
     int respawnTiming    = 120;
     int spawnTimeCounter = 0;
@@ -31,6 +34,8 @@ class Game
     {
         grid.init();
 
+        isGameRunning = true;
+
         initPieceGen(generator);
         spawnPiece();
     }
@@ -39,6 +44,7 @@ class Game
     {
         import std.random;
 
+        /// @ todo : write code to get random seed from system
         immutable seed = 666;
         const auto rand = Random(seed);
 
@@ -53,15 +59,28 @@ class Game
         import std.format;
         import std.string;
 
-        const auto text = toStringz(format("%d fps", GetFPS()));
+        const auto text =
+            toStringz(format("%d fps", GetFPS()));
         DrawText(text, 0, 0, 20, Colors.LIGHTGRAY);
 
         // +-- game grid --+
         grid.draw();
+        
+        if (isGameRunning)
+        {
+            return;
+        }
+
+        DrawText("GAME OVER!", 50, 50, 40, Colors.BLACK);
     }
 
     void update()
     {
+        if (!isGameRunning)
+        {
+            return;
+        }
+
         if (isBlockFading)
         {
             fadeCounter++;
@@ -82,6 +101,13 @@ class Game
             return;
         }
 
+        const isTurnPressed = IsKeyPressed(KeyboardKey.KEY_UP);
+        if(isTurnPressed)
+        {
+          turnPiece();
+        }
+
+
         executeLateralMove();
 
         if (!isPieceFalling && isSpawnTimerOver)
@@ -93,10 +119,10 @@ class Game
         }
 
         const isFastFallActive = IsKeyDown(KeyboardKey.KEY_DOWN);
-        if (gravityTime >= pieceGravityTiming && !isFastFallActive)
+        if (gravityTime >= pieceFallTiming && !isFastFallActive)
         {
             gravityTime = 0;
-        } else if (gravityTime >= fastFallGravityTiming && isFastFallActive)
+        } else if (gravityTime >= fastFallTiming && isFastFallActive)
         {
             gravityTime = 0;
         } else {
@@ -136,42 +162,39 @@ class Game
 
             grid.moveHorizontal(1);
         }
+    }
 
-        /* if (leftKeyPressed) */
-        /* { */
-        /*     lateralMovementCounter += 1; */
-        /* } else if (rightKeyPressed) */
-        /* { */
-        /*     lateralMovementCounter += 1; */
-        /* } else { */
-        /*     lateralMovementCounter = 0; */
-        /* } */
+    void turnPiece()
+    {
+        auto slices = grid.getPieceSlice();
+        Piece.clearGrid(slices);
 
-        /* const bool isLateralMoveCounterTimeout = lateralMovementCounter > lateralMovementTiming; */
-        /* if (isLateralMoveCounterTimeout && leftKeyPressed) { */
-        /*     grid.moveHorizontal(-1); */
-        /*     lateralMovementCounter = 0; */
-        /* } else */
-        /* if (isLateralMoveCounterTimeout && rightKeyPressed) { */
-        /*     grid.moveHorizontal(1); */
-        /*     lateralMovementCounter = 0; */
-        /* } */
+        const newLayout =
+           (currentPiece.currentLayout + 1) % currentPiece.layoutList.length;
+
+        if (!currentPiece.canWriteLayout(slices, newLayout))
+        {
+            currentPiece.currentLayout = newLayout;
+        }
+        
+        currentPiece.writeLayout(slices, currentPiece.currentLayout);
     }
 
     void spawnPiece()
     {
-        const auto piecePosition = game.grid.Vector2(4, 0);
+        const auto piecePosition = Vector2(4, 0);
         grid.piecePosition = piecePosition;
 
-        const x = piecePosition.x;
-        const y = piecePosition.y;
-        with(GameGrid.State)
+        currentPiece = generator.getRandomPiece();
+
+        auto slices = grid.getPieceSlice();
+        if (currentPiece.canWriteLayout(slices, 0))
         {
-            grid[y][x + 1]     = Moving;
-            grid[y + 1][x + 1] = Moving;
-            grid[y + 2][x + 1] = Moving;
-            grid[y + 3][x + 1] = Moving;
+            isGameRunning = false;
+            return; 
         }
+
+        currentPiece.writeLayout(slices, 0); 
     }
 }
 
