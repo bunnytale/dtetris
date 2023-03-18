@@ -103,7 +103,7 @@ struct GameGrid
         piecePosition.y++;
     }
 
-    // ----------------'--------------
+    // -------------------------------
     // turn every colliding piece into filled blocks
     //
     void stopPiece()
@@ -120,8 +120,7 @@ struct GameGrid
         {
             for (int row = x; row < offset.x; row++)
             {
-
-                if (row >= gridRowSize && row < 0)
+                if (row >= gridRowSize || row < 0)
                 {
                     continue;
                 }

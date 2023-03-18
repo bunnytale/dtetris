@@ -55,7 +55,8 @@ class Game
         import std.format;
         import std.string;
 
-        const auto text = toStringz(format("%d fps", GetFPS()));
+        const auto text =
+            toStringz(format("%d fps", GetFPS()));
         DrawText(text, 0, 0, 20, Colors.LIGHTGRAY);
 
         // +-- game grid --+
