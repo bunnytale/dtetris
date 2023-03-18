@@ -150,11 +150,16 @@ class Game
     void turnPiece()
     {
         auto slices = grid.getPieceSlice();
+        Piece.clearGrid(slices);
 
-        currentPiece.currentLayout =
+        const newLayout =
            (currentPiece.currentLayout + 1) % currentPiece.layoutList.length;
 
-        Piece.clearGrid(slices);
+        if (!currentPiece.canWriteLayout(slices, newLayout))
+        {
+            currentPiece.currentLayout = newLayout;
+        }
+        
         currentPiece.writeLayout(slices, currentPiece.currentLayout);
     }
 
