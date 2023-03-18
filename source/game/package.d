@@ -11,6 +11,8 @@ class Game
     GameGrid grid;
     Piece currentPiece;
 
+    bool isGameRunning;
+
     const lateralMoveTiming  = 5;
     auto  lateralMoveCounter = 0;
 
@@ -31,6 +33,8 @@ class Game
     this()
     {
         grid.init();
+
+        isGameRunning = true;
 
         initPieceGen(generator);
         spawnPiece();
@@ -61,10 +65,22 @@ class Game
 
         // +-- game grid --+
         grid.draw();
+        
+        if (isGameRunning)
+        {
+            return;
+        }
+
+        DrawText("GAME OVER!", 50, 50, 40, Colors.BLACK);
     }
 
     void update()
     {
+        if (!isGameRunning)
+        {
+            return;
+        }
+
         if (isBlockFading)
         {
             fadeCounter++;
@@ -172,6 +188,12 @@ class Game
         currentPiece = generator.getRandomPiece();
 
         auto slices = grid.getPieceSlice();
+        if (currentPiece.canWriteLayout(slices, 0))
+        {
+            isGameRunning = false;
+            return; 
+        }
+
         currentPiece.writeLayout(slices, 0); 
     }
 }
