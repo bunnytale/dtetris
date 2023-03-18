@@ -79,7 +79,7 @@ class PieceGenerator : PieceGenStrategy
 						[Empty, Moving, Moving, Empty],
 						[Empty, Empty,  Moving, Empty],
 						[Empty, Empty,  Moving, Empty],
-						[Empty, Empty,  Moving, Empty],
+						[Empty, Empty,  Empty,  Empty],
 					],
 					[
 						[Empty, Empty,  Empty,  Empty],
@@ -111,7 +111,7 @@ class PieceGenerator : PieceGenStrategy
 						[Empty, Moving, Moving, Empty],
 						[Empty, Moving, Empty,  Empty],
 						[Empty, Moving, Empty,  Empty],
-						[Empty, Moving, Empty,  Empty],
+						[Empty, Empty,  Empty,  Empty],
 					],
 					[
 						[Empty,  Empty,  Empty,  Empty],
